@@ -1,0 +1,16 @@
+# Build folders
+/bin/
+/obj/
+/.vs/
+/packages/
+/TestResults/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Temporary files
+*.log
+*.tmp
