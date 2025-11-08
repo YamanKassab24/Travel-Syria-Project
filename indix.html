@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel</title>
+
+    <!-- روابط التنسيق -->
+    <link rel="stylesheet" href="css/normlize.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/travel.css">
+
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ====== Header ====== -->
+    <header>
+        <i id="mainbar" class="fas fa-bars"></i>
+        <div class="logo">TRAVEL</div>
+
+        <nav class="navbar">
+            <a href="#home">home</a>
+            <a href="#book">book</a>
+            <a href="#packages">packages</a>
+            <a href="#services">services</a>
+            <a href="#review">review</a>
+            <a href="#contact">contact</a>
+        </nav>
+
+        <div class="icons">
+            <i class="fas fa-search" id="search-btn"></i>
+            <i class="fas fa-user" id="login-btn"></i>
+        </div>
+
+        <form action="" class="search-bar-container">
+            <input type="search" id="search-bar" placeholder="search here">
+            <label for="search-bar" class="fas fa-search"></label>
+        </form>
+    </header>
+
+    <!-- ====== Auth Modal ====== -->
+    <div class="auth-model">
+        <i class="fas fa-times" id="close"></i>
+
+        <!-- Login Form -->
+        <div class="form-container login">
+            <form action="">
+                <h3>Login</h3>
+
+                <div class="input-box">
+                    <input type="email" id="login-email" placeholder="enter your email">
+                </div>
+
+                <div class="input-box">
+                    <input type="password" id="login-password" placeholder="enter your password">
+                </div>
+
+                <button type="button" id="login-bt" class="btn">Login</button>
+
+                <p>Don't have an account? <a href="#" class="register-link">Register now</a></p>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-container register">
+            <h3>Register</h3>
+            <form id="registerForm" action="">
+                <div class="input-box">
+                    <input type="text" id="first-name" placeholder="enter your first name">
+                </div>
+
+                <div class="input-box">
+                    <input type="text" id="last-name" placeholder="enter your last name">
+                </div>
+
+                <div class="input-box">
+                    <input type="email" id="reg-email" placeholder="enter your email">
+                </div>
+
+                <div class="input-box">
+                    <input type="tel" id="phone" placeholder="enter your phone">
+                </div>
+
+                <div class="input-box">
+                    <input type="password" id="password" placeholder="enter your password">
+                </div>
+
+                <div class="input-box">
+                    <input type="text" id="country" placeholder="enter your country">
+                </div>
+
+                <select id="gender">
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                </select>
+
+                <input type="submit" value="register" class="btn" id="register-bt">
+
+                <p>Already have an account? <a href="#" class="login-link">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== Home Section ====== -->
+    <section class="home" id="home">
+        <div class="content">
+            <h3>Syria Travel</h3>
+        </div>
+    </section>
+
+    <!-- ====== Scripts ====== -->
+    <script src="main.js"></script>
+</body>
+
+</html>
