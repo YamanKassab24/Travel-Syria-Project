@@ -6,25 +6,59 @@ using Microsoft.Data.SqlClient;
 
 namespace TravelDataAccess
 {
-    public class clsCountryDA
+    public class CountryDTO
     {
-        public class CountryDTO
+        public int CountryID { get; set; }
+        public string CountryName { get; set; }
+
+
+        public CountryDTO(int CountryID, string CountryName)
         {
-            public int CountryID { get; set; }
-            public string CountryName { get; set; }
 
-
-       public CountryDTO(int CountryID,string CountryName)
-         {
-
-                this .CountryID = CountryID;
-                this .CountryName = CountryName;
-
-         }
+            this.CountryID = CountryID;
+            this.CountryName = CountryName;
 
         }
 
-       public static  CountryDTO GetCountryByID(int CountryID)
+    }
+    public class clsCountryDA
+    {
+
+        public static List<CountryDTO> GetAllCountry()
+        {
+            List<CountryDTO> countries = new List<CountryDTO>();
+            using (SqlConnection connection = new SqlConnection(GlobalClass._connectionString))
+            {
+
+                using (SqlCommand command = new SqlCommand("Sp_GetAllCountries", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(new CountryDTO(
+                                reader.GetInt32(reader.GetOrdinal("CountryID")),
+                                reader.GetString(reader.GetOrdinal("CountryName"))
+                               
+                            )
+                            );
+
+                        }
+
+
+                    }
+
+
+                }
+            }
+            return countries;
+        }
+
+
+        public static  CountryDTO GetCountryByID(int CountryID)
         {
             using (SqlConnection connection =new SqlConnection(GlobalClass._connectionString))
             {

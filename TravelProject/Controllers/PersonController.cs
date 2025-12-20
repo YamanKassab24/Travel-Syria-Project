@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TravelDataAccess;
 using TravelBussinessLayer;
+using TravelDataAccess;
 
 
 namespace TravelProject.Controllers
@@ -10,6 +11,7 @@ namespace TravelProject.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
+        [AllowAnonymous]
         [HttpGet("GetPersonByID", Name = "GetPersonByID")]
         public ActionResult<PersonDTO> GetPersonByID(int PersonID)
         {
@@ -32,8 +34,8 @@ namespace TravelProject.Controllers
         }
 
 
-
-    [HttpPost(Name = "AddNewPerson")]
+        [AllowAnonymous]
+        [HttpPost("AddNewPerson",Name = "AddNewPerson")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<PersonDTO> AddNewPerson(PersonDTO PersonDTO)

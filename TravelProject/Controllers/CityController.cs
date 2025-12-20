@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TravelBussinessLayer;
 using TravelDataAccess;
@@ -9,9 +10,36 @@ namespace TravelProject.Controllers
     [ApiController]
     public class CityController : ControllerBase
     {
-        [HttpGet("GetCityByID",Name ="GetCityByID")]
-          public ActionResult<CityDTO> GetCityID(int CityID)
-          {
+        [AllowAnonymous]
+        [HttpGet("GetCityByCountryID", Name = "GetCityByCountryID")]
+        public ActionResult<CityDTO> GetCityCountryID(int CountryID)
+        {
+            if (CountryID < 1)
+            {
+                return BadRequest("ID Not Accepted");
+            }
+
+              List<CityDTO> cities= clsCityBL.GetCityByCountryID(CountryID);
+
+            if (cities.Count > 0)
+            {
+                return Ok(cities);
+            }
+            else { return NotFound($"Not Found Cities With CountrID {CountryID}"); }
+           
+
+            
+
+
+
+
+
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetCityByID", Name = "GetCityByID")]
+        public ActionResult<CityDTO> GetCityID(int CityID)
+        {
             if (CityID < 1)
             {
                 return BadRequest("ID Not Accepted");
@@ -34,10 +62,11 @@ namespace TravelProject.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpGet("GetCityByCityName", Name = "GetCityByCityName")]
         public ActionResult<CityDTO> GetCityByCityName(string CityName)
         {
-            if (CityName=="")
+            if (CityName == "")
             {
                 return BadRequest("ID Not Accepted");
             }
@@ -59,7 +88,86 @@ namespace TravelProject.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
+
+        [HttpPost("AddNewCity", Name = "AddNewCity")]
+        public ActionResult<CityDTO> AddNewCity(RequestAddNewCity Model)
+        {
+            if (Model == null)
+            {
+                return BadRequest("BadRequest");
+            }
+
+            clsCityBL cityBL = new clsCityBL();
+            cityBL.CityName = Model.CityName;
+            cityBL.CountryID = Model.CountryID;
+            if (cityBL.Save())
+            {
+                CityDTO city = clsCityDA.GetCityByID(cityBL.CityID);
+                if (city == null)
+                {
+                    return Ok("Cant Find NewCity");
+                }
+                else
+                {
+                    return Ok(city);
+                }
+
+            }
+            else
+            {
+                return NotFound ("Field Add City");
+            }
+
+        }
 
 
+        [Authorize(Roles = "Admin")]
+
+        [HttpPut("UpdateCity", Name = "UpdateCity")]
+        public ActionResult<CityDTO> UpdateCity(RequestUpdateCity Model)
+        {
+            if (Model == null)
+            {
+                return BadRequest("BadRequest");
+            }
+
+            clsCityBL cityBL = new clsCityBL();
+            cityBL.CityName = Model.CityName;
+            cityBL.CountryID = Model.CountryID;
+            cityBL.CityID = Model.CityID;
+            cityBL.Mode = clsCityBL.enMode.Update;
+            if (cityBL.Save())
+            {
+                CityDTO city = clsCityDA.GetCityByID(cityBL.CityID);
+                if (city == null)
+                {
+                    return Ok("Cant Find City");
+                }
+                else
+                {
+                    return Ok(city);
+                }
+
+            }
+            else
+            {
+                return NotFound("Field update City");
+            }
+
+        }
+
+
+
+        public class RequestAddNewCity
+        {
+            public string CityName { get; set; }
+            public int CountryID { get; set; }
+        }
+        public class RequestUpdateCity : RequestAddNewCity
+        {
+            public int CityID { get; set; }
+
+        }
     }
 }

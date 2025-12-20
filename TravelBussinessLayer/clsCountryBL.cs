@@ -20,20 +20,20 @@ namespace TravelBussinessLayer
             this.CountryName = "";
         }
 
-        public clsCountryBL(clsCountryDA.CountryDTO CountrySTO)
+        public clsCountryBL(CountryDTO CountrySTO)
         {
             this.CountryID = CountrySTO.CountryID;
                 this.CountryName=CountrySTO.CountryName;
         }
         
-        public clsCountryDA.CountryDTO CountryDTO
+        public CountryDTO CountryDTO
         {
-            get { return (new clsCountryDA.CountryDTO(this.CountryID, this.CountryName)); } 
+            get { return (new CountryDTO(this.CountryID, this.CountryName)); } 
         }
 
         public static clsCountryBL Find (int CountryID)
         {
-            clsCountryDA.CountryDTO CountryDTO = clsCountryDA.GetCountryByID(CountryID);
+            CountryDTO CountryDTO = clsCountryDA.GetCountryByID(CountryID);
 
             if (CountryDTO != null)
             {
@@ -46,9 +46,14 @@ namespace TravelBussinessLayer
 
         }
 
+        static public List <CountryDTO> GetAllCountries()
+        {
+            return clsCountryDA.GetAllCountry();
+        }
+       
         public static clsCountryBL Find(string CountryName)
         {
-            clsCountryDA.CountryDTO CountryDTO = clsCountryDA.GetCountryByName(CountryName);
+            CountryDTO CountryDTO = clsCountryDA.GetCountryByName(CountryName);
 
             if (CountryDTO != null)
             {

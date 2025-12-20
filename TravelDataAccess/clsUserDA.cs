@@ -18,10 +18,12 @@ namespace TravelDataAccess
         public string Role { get; set; }
         public DateTime CreateAt { get; set; }
         public bool IsActive { get; set; }
-        public int PersonID { get; set; }
+       public int PersonID { get; set; }
         public decimal WalletBalance { get; set; }
 
-        public PersonDTO Person { get; set; }
+        public PersonDTO Person { get; set; } = new PersonDTO(
+        -1, "", "", "", "", true, DateTime.Now, "", -1
+    );
 
         public UserDTO(int UserID, string Role, DateTime CreateAt, bool IsActive, int PersonID, decimal WalletBalance)
         {
@@ -32,9 +34,18 @@ namespace TravelDataAccess
             this.IsActive = IsActive;
             this.PersonID = PersonID;
             this.WalletBalance = WalletBalance;
+            if(this.PersonID!=-1)
             this.Person = clsPersonDA.GetPersonByID(this.PersonID);
         }
-
+        public UserDTO()
+        {
+            this.UserID = -1;
+            this.Role = "";
+            this.CreateAt = DateTime.Now;
+            this.IsActive = true;
+            this.WalletBalance = 0;
+           
+        }
 
     }
 
@@ -57,20 +68,18 @@ namespace TravelDataAccess
 
                     using (var reader = command.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
                             Users.Add(new UserDTO(
                                 reader.GetInt32(reader.GetOrdinal("UserID")),
                                 reader.GetString(reader.GetOrdinal("Role")),
-                                reader.GetDateTime(reader.GetOrdinal("CreateAt")),
+                                reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
                                 reader.GetBoolean(reader.GetOrdinal("IsActive")),
                                 reader.GetInt32(reader.GetOrdinal("PersonID")),
                                 reader.GetDecimal(reader.GetOrdinal("WalletBalance"))
 
                             )
-                            {
-
-                            });
+                            );
 
                         }
 
@@ -157,7 +166,7 @@ namespace TravelDataAccess
         }
 
 
-        public static int AddNewUser(UserDTO NewUser,PersonDTO NewPerson,string Password)
+        public static int AddNewUser(UserDTO NewUser,string Password)
         {
 
             using (SqlConnection connection = new SqlConnection(GlobalClass._connectionString))
@@ -165,17 +174,17 @@ namespace TravelDataAccess
                 using (SqlCommand command = new SqlCommand("Sp_AddNewUserWithPerson", connection))
                 {
                     command.CommandType= CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@FirstName", NewPerson.FirstName);
-                    command.Parameters.AddWithValue("@LastName", NewPerson.LastName);
-                    command.Parameters.AddWithValue("@Phone", NewPerson.Phone);
-                    command.Parameters.AddWithValue("@Email", NewPerson.Email);
-                    command.Parameters.AddWithValue("@Gender", NewPerson.IsMale);
-                    command.Parameters.AddWithValue("DateOfBirth", NewPerson.DateOfBirth);
-                    command.Parameters.AddWithValue("@Image", NewPerson.Image);
-                    command.Parameters.AddWithValue("@CountryID", NewPerson.CountryID);
+                    command.Parameters.AddWithValue("@FirstName",NewUser.Person.FirstName);
+                    command.Parameters.AddWithValue("@LastName", NewUser.Person.LastName);
+                    command.Parameters.AddWithValue("@Phone", NewUser.Person.Phone);
+                    command.Parameters.AddWithValue("@Email", NewUser.Person.Email);
+                    command.Parameters.AddWithValue("@Gender", NewUser.Person.IsMale);
+                    command.Parameters.AddWithValue("DateOfBirth", DateTime.Now);
+                    command.Parameters.AddWithValue("@Image", NewUser.Person.Image);
+                    command.Parameters.AddWithValue("@CountryID", NewUser.Person.CountryID);
                     command.Parameters.AddWithValue("@Password", Password);
                     command.Parameters.AddWithValue("@Role", NewUser.Role);
-                    command.Parameters.AddWithValue("@IsActive", NewUser.IsActive);
+                    command.Parameters.AddWithValue("@IsActive", true);
 
                     var outputIdParam = new SqlParameter("@UserID", SqlDbType.Int)
                     {
@@ -199,6 +208,107 @@ namespace TravelDataAccess
 
 
     }
+
+        public static bool IsCorrectCurrentPassword(int UserID , string Password)
+        {
+            bool IsFound = false;
+
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GlobalClass._connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("Sp_IsCorrectCurantPassword", connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", UserID);
+                        command.Parameters.AddWithValue("@Password", Password);
+                        command.CommandType = CommandType.StoredProcedure;
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
+                        if (reader.HasRows)
+                        {
+                            IsFound = true;
+                        }
+
+
+
+                    }
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+
+            return IsFound;
+        }
+        public static bool UpdatePassword (int UserID,string CurrentPassword,string NewPassword)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(GlobalClass._connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("Sp_UpdatePassword ", connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", UserID);
+                        command.Parameters.AddWithValue("@NewPassword",NewPassword);
+                        command.Parameters.AddWithValue("@CurrentPassword", CurrentPassword);
+
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        //SqlDataReader reader = command.ExecuteReader();
+                        //if (reader.HasRows)
+                        //{
+                        //    IsFound = true;
+                        //}
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        return true;
+
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+
+
+
+
+        }
+        public static bool DeleteUserByUserID(int UserID )
+        {
+
+            using (SqlConnection connection = new SqlConnection(GlobalClass._connectionString))
+            {
+                using (SqlCommand command= new SqlCommand("Sp_DeleteUserByUserID",connection))
+                {
+
+                    command.Parameters.AddWithValue("@UserID",UserID);
+                    command.CommandType = CommandType.StoredProcedure;
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    return  true;
+
+
+                }
+
+
+
+            }
+
+
+
+        }
+       
 
     }
 }

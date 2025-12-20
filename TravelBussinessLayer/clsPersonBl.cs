@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using TravelDataAccess;
@@ -98,6 +99,10 @@ namespace TravelBussinessLayer
 
 
         }
+        private bool _UpdatePerson(PersonDTO PersonDTO)
+        {
+            return clsPersonDA.UpdatePerson(PersonDTO);
+        }
 
         public bool Save()
         {
@@ -119,7 +124,8 @@ namespace TravelBussinessLayer
                         return false;
                     }
                 case enMode.Update:
-                    return false;
+                    _UpdatePerson(this.PDTO);
+                    return true ;
 
 
             }

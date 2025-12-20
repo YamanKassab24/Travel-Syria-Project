@@ -20,7 +20,7 @@ namespace TravelBussinessLayer
         public int PersonID { get; set; }
         public decimal WalletBalance { get; set; }
 
-
+        clsPersonBl PersonBl=new clsPersonBl();
         clsUserBL(UserDTO UserDTO ,enMode NewMode=enMode.AddNew)
         {
         UserID = UserDTO.UserID;
@@ -28,6 +28,7 @@ namespace TravelBussinessLayer
         CreateAt = UserDTO.CreateAt;
         IsActive = UserDTO.IsActive;
         PersonID = UserDTO.PersonID;
+         PersonBl = clsPersonBl.GetPersonByID(UserDTO.PersonID);
         WalletBalance = UserDTO.WalletBalance;
          Mode = NewMode;
         
@@ -60,7 +61,7 @@ namespace TravelBussinessLayer
             if (User != null)
             {
 
-                return new clsUserBL(User);
+                return new clsUserBL(User,enMode.Update);
 
 
             }
@@ -71,30 +72,44 @@ namespace TravelBussinessLayer
 
 
         }
-        public static string LoginWithJwt(string EmailOrPhone, string Password)
+        public static UserDTO LoginWithJwt(string EmailOrPhone, string Password)
         {
             var user = clsUserDA.LoginWithEmailOrPhone(EmailOrPhone, Password);
-            if (user == null) 
+            if (user == null)
                 return null;
 
-            string secretKey = "ProcrastinateNowStudyLater12345678";
-            string issuer = "Travel";
-            string audience = "TravelApp";
-            int expiryMinutes = 1000;
-
-            return JwtService.GenerateToken(user, secretKey, issuer, audience, expiryMinutes);
+            
+            return user;
         }
 
-        private bool _AddNewUser(RequesAddNewUser RequestNewUser)
+        private bool _AddNewUser(AddNewUserRequest RequestNewUser)
         {
-            this.UserID = clsUserDA.AddNewUser(RequestNewUser.NewUser, RequestNewUser.NewUser.Person, RequestNewUser.Password);
+            UserDTO userDTO = new UserDTO();
+            userDTO .UserID = RequestNewUser.UserID;
+            userDTO .Role = RequestNewUser.Role;    
+            userDTO.Person.FirstName=RequestNewUser.firstName;
+            userDTO.Person.LastName=RequestNewUser.lastName;
+            userDTO.Person.Email=RequestNewUser.email;
+            userDTO.Person.Phone=RequestNewUser.phone;
+            userDTO .CreateAt=RequestNewUser .createAt;
+            userDTO.Person.DateOfBirth=RequestNewUser .dateOfBirth;
+            userDTO.Person.Image=RequestNewUser.image;
+            userDTO.Person.CountryID=RequestNewUser.countryID;
+            userDTO.Person.IsMale = RequestNewUser.isMale;
+            this.UserID = clsUserDA.AddNewUser(userDTO, RequestNewUser.password);
 
             return (this.UserID != -1);
 
 
         }
-        public RequesAddNewUser RequestNewUser { get; set; } = new RequesAddNewUser();
+  
+       
+     static  public  List<UserDTO>GetAllUsers()
+        {
+            return clsUserDA.GetAllUsers();
 
+        }
+        public AddNewUserRequest AddNewUserRequest { get; set; } = new AddNewUserRequest();
         public bool Save()
         {
 
@@ -104,7 +119,7 @@ namespace TravelBussinessLayer
                 case enMode.AddNew:
 
 
-                    if (_AddNewUser(this.RequestNewUser))
+                    if (_AddNewUser(this.AddNewUserRequest))
                     {
                         Mode = enMode.Update;
                         return true;
@@ -115,20 +130,48 @@ namespace TravelBussinessLayer
                         return false;
                     }
                 case enMode.Update:
+                
                     return false;
 
 
             }
             return false;
         }
+
+        public static bool DeleteUserByUserID(int UserID)
+        {
+           return clsUserDA.DeleteUserByUserID(UserID); 
+
+        }
+
+
+        public static bool UpdatePassword(int UserID,string CurrentPassword, string Password)
+        {
+            return clsUserDA.UpdatePassword(UserID,CurrentPassword, Password);
+        }
+        public static bool IsCorrectCurrentPassword(int UserID ,string Password)
+        {
+            return clsUserDA.IsCorrectCurrentPassword(UserID, Password);
+        }
     }
 
-
-    public class RequesAddNewUser
+    public class AddNewUserRequest
     {
-        
-        public UserDTO NewUser { get; set; }
-        public string Password { get; set; }
+
+
+
+        public int UserID { set; get; }
+        public string firstName { set; get; }
+        public string lastName { set; get; }
+        public string phone { set; get; }
+        public string email { set; get; }
+        public bool isMale { set; get;  }
+        public DateTime dateOfBirth { set; get; }
+        public string image { set; get; }
+        public int countryID { set; get; }
+        public DateTime createAt { set; get; }
+        public string Role { get; set; }
+        public string password { set; get; }
     }
 }
 

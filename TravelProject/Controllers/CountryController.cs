@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using TravelBussinessLayer;
@@ -10,9 +11,9 @@ namespace TravelProject.Controllers
     [ApiController]
     public class CountryController : ControllerBase
     {
-
+        [AllowAnonymous]
         [HttpGet( "GetCountryByID",Name = "GetCountryByID")]
-        public ActionResult<clsCountryDA.CountryDTO> GetCountryByID(int ID)
+        public ActionResult<CountryDTO> GetCountryByID(int ID)
         {
             if (ID < 1)
             {
@@ -26,15 +27,15 @@ namespace TravelProject.Controllers
                 return NotFound("Country Not Found");
             }
 
-            clsCountryDA.CountryDTO CountryDto = Country.CountryDTO;
+            CountryDTO CountryDto = Country.CountryDTO;
 
             return Ok(CountryDto);
 
         }
 
-
+        [AllowAnonymous]
         [HttpGet("GetCountryByName",Name = "GetCountryByName")]
-        public ActionResult<clsCountryDA.CountryDTO> GetCountryByName(string CountryName)
+        public ActionResult<CountryDTO> GetCountryByName(string CountryName)
         {
 
             if (CountryName == "")
@@ -51,13 +52,24 @@ namespace TravelProject.Controllers
 
             }
 
-            clsCountryDA.CountryDTO CountryDto = Country.CountryDTO;
+            CountryDTO CountryDto = Country.CountryDTO;
 
             return CountryDto;
 
         }
+        [AllowAnonymous]
+        [HttpGet("GetAllCountries", Name = "GetAllCountries")]
+        public ActionResult<IEnumerable<CountryDTO>> GetAllCountries()
+        {
 
+            List<CountryDTO> Countries = new List<CountryDTO>();
+            Countries = clsCountryBL.GetAllCountries();
+            if (Countries.Count == 0)
+            {
+                return NotFound("No Countries Found");
+            }
 
-
+            return Ok(Countries);
+        }
     }
 }

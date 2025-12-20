@@ -29,9 +29,9 @@ namespace TravelDataAccess
 
         public string Image    { set; get; }
 
-        public int CountryID { set; get; }
+        public  int CountryID { set; get; }
 
-        public clsCountryDA.CountryDTO Country { set; get; }
+        public CountryDTO Country { set; get; }
 
         public PersonDTO(int PersonID,string FirstName,string LastName ,string Phone ,string Email, bool IsMale, DateTime DateOfBirth ,string Image ,int CountryID) 
         {
@@ -46,7 +46,7 @@ namespace TravelDataAccess
             this.DateOfBirth = DateOfBirth;
             this.Image = Image;
             this.CountryID = CountryID;
-            this.Country = clsCountryDA.GetCountryByID(this.CountryID);
+            this.Country = clsCountryDA.GetCountryByID(CountryID);
         
         }    
     }
@@ -132,7 +132,33 @@ namespace TravelDataAccess
             }
         }
 
+        public static bool UpdatePerson(PersonDTO PDTO)
+        {
+            using (var connection = new SqlConnection(GlobalClass._connectionString))
+            using (var command = new SqlCommand("SP_UpdateUser", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
 
+                
+                command.Parameters.AddWithValue("@FirstName", PDTO.FirstName);
+                command.Parameters.AddWithValue("@LastName", PDTO.LastName);
+                command.Parameters.AddWithValue("@Phone", PDTO.Phone);
+                command.Parameters.AddWithValue("@Email", PDTO.Email);
+                command.Parameters.AddWithValue("@Gender", PDTO.IsMale);
+                command.Parameters.AddWithValue("DateOfBirth",DateTime.Now);
+                command.Parameters.AddWithValue("@Image", PDTO.Image);
+                command.Parameters.AddWithValue("@CountryID", PDTO.CountryID);
+                command.Parameters.AddWithValue("@PersonID", PDTO.PersonID);
+
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                return true;
+
+            }
+
+            return false;
+        }
 
     }
 }
