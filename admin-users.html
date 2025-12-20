@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>إدارة المستخدمين - لوحة الأدمن</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f3f4f6;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 20px 16px;
+    }
+
+    .sidebar-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav a {
+      color: #e5e7eb;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .nav a.active {
+      background: #1f2937;
+      font-weight: 600;
+    }
+
+    .nav a:hover {
+      background: #374151;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px 26px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .btn {
+      border-radius: 4px;
+      padding: 6px 12px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      padding: 7px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      min-width: 260px;
+      font-size: 13px;
+    }
+
+    .alert {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 8px;
+      display: none;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-role {
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      display: inline-block;
+    }
+
+    .badge-admin {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-user {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 8px;
+      width: 720px;
+      max-width: 95%;
+      padding: 16px 18px 18px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-top: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 12px;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    select {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb33;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 3px;
+    }
+
+    .modal-footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+    }
+
+    .small-hint {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-title">لوحة الأدمن</div>
+      <nav class="nav">
+        <a href="admin-dashboard.html">لوحة التحكم</a>
+        <a href="admin-users.html" class="active">المستخدمون</a>
+        <a href="admin-companies.html">الشركات</a>
+        <a href="admin-trips.html">الرحلات</a>
+        <a href="admin-reservations.html">الحجوزات</a>
+        <a href="admin-services.html">الخدمات</a>
+        <a href="admin-cities.html">المدن</a>
+        <a href="admin-countries.html">الدول</a>
+        <a href="admin-payments.html">المدفوعات</a>
+        <a href="admin-message.html">الرسائل</a>
+        <a href="admin-settings.html">إعدادات النظام</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <div class="page-title">إدارة المستخدمين</div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="justify-content: space-between;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <input id="searchInput" class="search-input" type="text" placeholder="بحث بالاسم أو رقم الهاتف..." />
+          <button class="btn btn-secondary" onclick="clearSearch()">مسح البحث</button>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="loadUsers()">تحديث القائمة</button>
+          <button class="btn btn-primary" onclick="openAddModal()">إضافة مستخدم جديد</button>
+        </div>
+      </div>
+
+      <div id="alertBox" class="alert"></div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>البريد</th>
+              <th>الهاتف</th>
+              <th>الدور</th>
+              <th>تاريخ الإنشاء</th>
+              <th>تحكم</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td colspan="7" style="text-align:center;color:#6b7280;">جاري تحميل البيانات...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- USER MODAL -->
+  <div class="modal-backdrop" id="userModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">إضافة مستخدم جديد</h2>
+        <div class="modal-subtitle" id="modalSubtitle"></div>
+      </div>
+
+      <div class="modal-grid">
+        <div class="form-group">
+          <label>الاسم الأول</label>
+          <input type="text" id="firstNameInput" />
+        </div>
+
+        <div class="form-group">
+          <label>اسم العائلة</label>
+          <input type="text" id="lastNameInput" />
+        </div>
+
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="emailInput" />
+        </div>
+
+        <div class="form-group">
+          <label>رقم الهاتف</label>
+          <input type="text" id="phoneInput" />
+        </div>
+
+        <div class="form-group">
+          <label>الدور</label>
+          <select id="roleSelect">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>كلمة المرور (للإضافة فقط)</label>
+          <input type="password" id="passwordInput" placeholder="اتركه فارغاً في التعديل" />
+          <span class="small-hint" id="passwordHint"></span>
+        </div>
+
+        <div class="form-group">
+          <label>تاريخ الميلاد</label>
+          <input type="date" id="dobInput" />
+        </div>
+
+        <div class="form-group">
+          <label>الدولة</label>
+          <select id="countrySelect">
+            <option value="">اختر الدولة</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>الجنس</label>
+          <div class="radio-group">
+            <label><input type="radio" name="gender" value="male" checked /> ذكر</label>
+            <label><input type="radio" name="gender" value="female" /> أنثى</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveUser()">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD MODAL (for ANY user) -->
+  <div class="modal-backdrop" id="passModalBackdrop">
+    <div class="modal" style="width:520px;max-width:95%;">
+      <div class="modal-header">
+        <h2 class="modal-title">تعديل كلمة المرور</h2>
+        <div class="modal-subtitle" id="passModalSubtitle"></div>
+      </div>
+
+      <div class="modal-grid" style="grid-template-columns: 1fr; gap:10px;">
+        <div class="form-group">
+          <label>كلمة المرور الحالية</label>
+          <input type="password" id="currentPassInput" placeholder="Current password" />
+        </div>
+
+        <div class="form-group">
+          <label>كلمة المرور الجديدة</label>
+          <input type="password" id="newPassInput" placeholder="New password" />
+        </div>
+
+        <div class="form-group">
+          <label>تأكيد كلمة المرور الجديدة</label>
+          <input type="password" id="confirmPassInput" placeholder="Confirm new password" />
+          <span class="small-hint">يفضل 6 أحرف أو أكثر.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePasswordModal()">إلغاء</button>
+        <button class="btn btn-primary" onclick="savePassword()">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+    const TOKEN_KEY = "token";
+
+    let users = [];
+    let countries = [];
+    let isEditMode = false;
+    let currentUserId = null;
+
+    let passUserId = null;
+
+    const alertBox = document.getElementById("alertBox");
+    const usersTableBody = document.getElementById("usersTableBody");
+
+    function getToken() {
+      return localStorage.getItem(TOKEN_KEY);
+    }
+
+    function requireAuthOrRedirect() {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "login.html";
+        return false;
+      }
+      return true;
+    }
+
+    function authHeaders(extra = {}) {
+      const token = getToken();
+      return {
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+        ...extra
+      };
+    }
+
+    async function fetchAny(url, options = {}, label = "") {
+      const res = await fetch(url, options);
+
+      if (res.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+        window.location.href = "login.html";
+        return null;
+      }
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error((label ? (label + ": ") : "") + txt);
+      }
+
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) return await res.json();
+      return await res.text();
+    }
+
+    function showAlert(msg) {
+      alertBox.textContent = msg;
+      alertBox.style.display = "block";
+    }
+
+    function clearAlert() {
+      alertBox.textContent = "";
+      alertBox.style.display = "none";
+    }
+
+    function roleBadge(role) {
+      if (!role) return "";
+      const r = role.toLowerCase();
+      if (r === "admin") return `<span class="badge-role badge-admin">Admin</span>`;
+      return `<span class="badge-role badge-user">User</span>`;
+    }
+
+    function formatDateTime(dt) {
+      if (!dt) return "";
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return dt;
+      return d.toLocaleString("ar-SY", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    // search helpers
+    function normalizeText(s) {
+      return (s || "").toString().trim().toLowerCase();
+    }
+
+    function getUserFullName(u) {
+      const person = u.person || u.Person || {};
+      return ((person.firstName || person.FirstName || "") + " " +
+        (person.lastName || person.LastName || "")).trim();
+    }
+
+    function getUserPhone(u) {
+      const person = u.person || u.Person || {};
+      return person.phone || person.Phone || "";
+    }
+
+    function filterUsers(list) {
+      const q = normalizeText(document.getElementById("searchInput")?.value);
+      if (!q) return list;
+
+      return list.filter(u => {
+        const name = normalizeText(getUserFullName(u));
+        const phone = normalizeText(getUserPhone(u));
+        return name.includes(q) || phone.includes(q);
+      });
+    }
+
+    function clearSearch() {
+      const el = document.getElementById("searchInput");
+      if (el) el.value = "";
+      renderUsersTable();
+    }
+
+    async function loadCountries() {
+      try {
+        const data = await fetchAny(
+          API_BASE + "/api/Country/GetAllCountries", {
+            headers: authHeaders()
+          },
+          "تعذر تحميل الدول"
+        );
+
+        if (data == null) return;
+
+        let arr = data;
+        if (!Array.isArray(arr)) arr = [arr];
+        countries = arr;
+
+        const select = document.getElementById("countrySelect");
+        select.innerHTML = `<option value="">اختر الدولة</option>`;
+        countries.forEach(c => {
+          const id = c.countryID || c.CountryID;
+          const name = c.countryName || c.CountryName;
+          if (id != null) {
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = name;
+            select.appendChild(opt);
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        showAlert("تعذر تحميل قائمة الدول");
+      }
+    }
+
+    async function loadUsers() {
+      if (!requireAuthOrRedirect()) return;
+
+      clearAlert();
+      usersTableBody.innerHTML = `
+        <tr><td colspan="7" style="text-align:center;color:#6b7280;">جاري تحميل البيانات...</td></tr>`;
+
+      try {
+        const data = await fetchAny(
+          API_BASE + "/api/User/GetAllUsers", {
+            headers: authHeaders()
+          },
+          "تعذر تحميل المستخدمين"
+        );
+
+        if (data == null) return;
+
+        let arr = data;
+        if (!Array.isArray(arr)) arr = [arr];
+        users = arr;
+
+        renderUsersTable();
+      } catch (err) {
+        console.error(err);
+        usersTableBody.innerHTML = `
+          <tr><td colspan="7" style="text-align:center;color:#b91c1c;">تعذر تحميل المستخدمين من الخادم.</td></tr>`;
+      }
+    }
+
+    function renderUsersTable() {
+      const list = filterUsers(users);
+
+      if (!list || list.length === 0) {
+        usersTableBody.innerHTML = `
+          <tr><td colspan="7" style="text-align:center;color:#6b7280;">لا يوجد مستخدمون.</td></tr>`;
+        return;
+      }
+
+      usersTableBody.innerHTML = "";
+      list.forEach((u, idx) => {
+        const person = u.person || u.Person || {};
+        const fullName = getUserFullName(u);
+        const uid = u.userID || u.UserID;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${(uid != null ? `#${uid} - ` : "")}${fullName || "-"}</td>
+          <td>${person.email || person.Email || "-"}</td>
+          <td>${person.phone || person.Phone || "-"}</td>
+          <td>${roleBadge(u.role || u.Role)}</td>
+          <td>${formatDateTime(u.createAt || u.CreateAt)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-secondary" style="font-size:12px;padding:3px 8px;"
+                onclick="openEditModal(${uid})">تعديل</button>
+
+              <button class="btn btn-secondary" style="font-size:12px;padding:3px 8px;"
+                onclick="openPasswordModal(${uid})">تعديل الباسورد</button>
+
+              <button class="btn btn-danger" style="font-size:12px;padding:3px 8px;"
+                onclick="deleteUser(${uid})">حذف</button>
+            </div>
+          </td>
+        `;
+        usersTableBody.appendChild(tr);
+      });
+    }
+
+    // User modal
+    function openAddModal() {
+      isEditMode = false;
+      currentUserId = null;
+      document.getElementById("modalTitle").textContent = "إضافة مستخدم جديد";
+      document.getElementById("modalSubtitle").textContent = "";
+
+      document.getElementById("firstNameInput").value = "";
+      document.getElementById("lastNameInput").value = "";
+      document.getElementById("emailInput").value = "";
+      document.getElementById("phoneInput").value = "";
+      document.getElementById("roleSelect").value = "User";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("dobInput").value = "";
+      document.getElementById("countrySelect").value = "";
+      document.querySelector('input[name="gender"][value="male"]').checked = true;
+
+      document.getElementById("passwordInput").disabled = false;
+      document.getElementById("passwordHint").textContent = "مطلوب عند الإضافة (إذا تركته فاضي سيتم وضع 123456).";
+
+      document.getElementById("userModalBackdrop").style.display = "flex";
+    }
+
+    function openEditModal(userId) {
+      const u = users.find(x => (x.userID || x.UserID) === userId);
+      if (!u) return;
+
+      isEditMode = true;
+      currentUserId = userId;
+      document.getElementById("modalTitle").textContent = "تعديل مستخدم";
+      document.getElementById("modalSubtitle").textContent = `UserID: #${userId}`;
+
+      const person = u.person || u.Person || {};
+      document.getElementById("firstNameInput").value = person.firstName || person.FirstName || "";
+      document.getElementById("lastNameInput").value = person.lastName || person.LastName || "";
+      document.getElementById("emailInput").value = person.email || person.Email || "";
+      document.getElementById("phoneInput").value = person.phone || person.Phone || "";
+      document.getElementById("roleSelect").value = u.role || u.Role || "User";
+
+      const dob = person.dateOfBirth || person.DateOfBirth;
+      if (dob) {
+        const d = new Date(dob);
+        if (!isNaN(d.getTime())) {
+          document.getElementById("dobInput").value = d.toISOString().slice(0, 10);
+        }
+      } else {
+        document.getElementById("dobInput").value = "";
+      }
+
+      const cID = person.countryID || person.CountryID;
+      document.getElementById("countrySelect").value = (cID != null ? cID : "");
+
+      const isMale = person.isMale ?? person.IsMale;
+      if (isMale === false) {
+        document.querySelector('input[name="gender"][value="female"]').checked = true;
+      } else {
+        document.querySelector('input[name="gender"][value="male"]').checked = true;
+      }
+
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("passwordInput").disabled = true;
+      document.getElementById("passwordHint").textContent = "لا يمكن تعديل الباسورد من هنا، استخدم زر (تعديل الباسورد).";
+
+      document.getElementById("userModalBackdrop").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("userModalBackdrop").style.display = "none";
+    }
+
+    async function saveUser() {
+      if (!requireAuthOrRedirect()) return;
+
+      clearAlert();
+
+      const firstName = document.getElementById("firstNameInput").value.trim();
+      const lastName = document.getElementById("lastNameInput").value.trim();
+      const email = document.getElementById("emailInput").value.trim();
+      const phone = document.getElementById("phoneInput").value.trim();
+      const role = document.getElementById("roleSelect").value;
+      const password = document.getElementById("passwordInput").value;
+      const dob = document.getElementById("dobInput").value;
+      const countryIDValue = document.getElementById("countrySelect").value;
+      const genderValue = document.querySelector('input[name="gender"]:checked').value;
+      const isMale = (genderValue === "male");
+
+      if (!firstName || !lastName || !email || !phone) {
+        showAlert("الرجاء تعبئة الحقول الأساسية (الاسم، البريد، الهاتف).");
+        return;
+      }
+
+      const countryID = parseInt(countryIDValue);
+      if (isNaN(countryID)) {
+        showAlert("الرجاء اختيار الدولة من القائمة.");
+        return;
+      }
+
+      try {
+        if (isEditMode) {
+          const payload = {
+            userID: currentUserId,
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone,
+            email: email,
+            isMale: isMale,
+            dateOfBirth: dob ? new Date(dob).toISOString() : new Date().toISOString(),
+            image: " ",
+            countryID: countryID
+          };
+
+          await fetchAny(API_BASE + "/api/User/UpdateUser", {
+            method: "PUT",
+            headers: authHeaders({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(payload)
+          }, "خطأ في التعديل");
+
+        } else {
+          const payload = {
+            userID: 0,
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone,
+            email: email,
+            isMale: isMale,
+            dateOfBirth: dob ? new Date(dob).toISOString() : new Date().toISOString(),
+            image: "",
+            countryID: countryID,
+            createAt: new Date().toISOString(),
+            role: role,
+            password: password || "123456"
+          };
+
+          await fetchAny(API_BASE + "/api/User/AddNewUser", {
+            method: "POST",
+            headers: authHeaders({
+              "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(payload)
+          }, "خطأ في الإضافة");
+        }
+
+        closeModal();
+        await loadUsers();
+      } catch (err) {
+        console.error(err);
+        showAlert("فشل حفظ المستخدم. تحقق من البيانات.");
+      }
+    }
+
+    async function deleteUser(userId) {
+      if (!requireAuthOrRedirect()) return;
+      if (!confirm("هل أنت متأكد من حذف هذا المستخدم؟")) return;
+
+      clearAlert();
+      try {
+        await fetchAny(API_BASE + "/api/User/DeleteUserByUserID?UserID=" + userId, {
+          method: "DELETE",
+          headers: authHeaders()
+        }, "خطأ في الحذف");
+
+        await loadUsers();
+      } catch (err) {
+        console.error(err);
+        showAlert("تعذر حذف المستخدم");
+      }
+    }
+
+    // Password modal (ANY user)
+    function openPasswordModal(userId) {
+      passUserId = userId;
+
+      document.getElementById("currentPassInput").value = "";
+      document.getElementById("newPassInput").value = "";
+      document.getElementById("confirmPassInput").value = "";
+
+      document.getElementById("passModalSubtitle").textContent = `UserID: #${userId}`;
+      document.getElementById("passModalBackdrop").style.display = "flex";
+    }
+
+    function closePasswordModal() {
+      document.getElementById("passModalBackdrop").style.display = "none";
+      passUserId = null;
+    }
+
+    async function savePassword() {
+      if (!requireAuthOrRedirect()) return;
+      clearAlert();
+
+      const currentPass = document.getElementById("currentPassInput").value.trim();
+      const newPass = document.getElementById("newPassInput").value.trim();
+      const confirm = document.getElementById("confirmPassInput").value.trim();
+
+      if (!passUserId) {
+        showAlert("UserID غير صالح.");
+        return;
+      }
+
+      if (!currentPass || !newPass || !confirm) {
+        showAlert("الرجاء تعبئة كلمة المرور الحالية والجديدة والتأكيد.");
+        return;
+      }
+
+      if (newPass.length < 6) {
+        showAlert("كلمة المرور الجديدة قصيرة (يفضل 6 أحرف أو أكثر).");
+        return;
+      }
+
+      if (newPass !== confirm) {
+        showAlert("كلمة المرور الجديدة وتأكيدها غير متطابقين.");
+        return;
+      }
+
+      try {
+        await fetchAny(
+          API_BASE + `/api/User/UpdatePassword?UserID=${passUserId}&CurrentPassword=${encodeURIComponent(currentPass)}&Newpassword=${encodeURIComponent(newPass)}`, {
+            method: "PUT",
+            headers: authHeaders()
+          },
+          "خطأ بتعديل كلمة المرور"
+        );
+
+        closePasswordModal();
+        alert("تم تعديل كلمة المرور بنجاح ✅");
+      } catch (err) {
+        console.error(err);
+        showAlert("فشل تعديل كلمة المرور. تأكد من كلمة المرور الحالية.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuthOrRedirect()) return;
+
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => renderUsersTable());
+      }
+
+      loadCountries();
+      loadUsers();
+    });
+  </script>
+</body>
+
+</html>

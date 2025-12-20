@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة المدن - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button.danger {
+            background: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        @media (max-width:768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        <div class="content">
+            <h1>إدارة المدن</h1>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>قائمة المدن</h2>
+                    <div class="filters">
+                        <button onclick="openAddModal()">إضافة مدينة جديدة</button>
+                        <button class="secondary" onclick="loadCitiesBySelectedCountry()">تحديث القائمة</button>
+                    </div>
+                </div>
+
+                <!-- فلترة الدولة -->
+                <div class="filters" style="margin-bottom:10px;">
+                    <div class="form-group" style="min-width:260px;">
+                        <label for="filterCountry">فلترة حسب الدولة</label>
+                        <select id="filterCountry" onchange="loadCitiesBySelectedCountry()">
+                            <option value="">اختر دولة لعرض مدنها...</option>
+                        </select>
+                        <div class="small-text">عند اختيار دولة سيتم جلب مدنها فقط.</div>
+                    </div>
+                </div>
+
+                <table id="citiesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>المدينة</th>
+                            <th>الدولة</th>
+                            <th>تحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="cityModal">
+        <div class="modal">
+            <h2 id="modalTitle">إضافة مدينة جديدة</h2>
+
+            <div class="form-group">
+                <label for="cityName">اسم المدينة</label>
+                <input type="text" id="cityName">
+            </div>
+
+            <div class="form-group">
+                <label for="cityCountry">الدولة</label>
+                <select id="cityCountry">
+                    <option value="">اختر دولة...</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="saveCity()">حفظ</button>
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+
+
+        const TOKEN_KEY = "token";
+        function getToken() { return localStorage.getItem(TOKEN_KEY); }
+        function requireAuthOrRedirect() {
+            const t = getToken();
+            if (!t) { window.location.href = "login.html"; return false; }
+            return true;
+        }
+        function authHeaders(extra = {}) {
+            const t = getToken();
+            return { "Accept": "application/json", "Authorization": `Bearer ${t}`, ...extra };
+        }
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? label + ": " : "") + txt);
+            }
+            const ct = res.headers.get("content-type") || "";
+            if (ct.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+
+        const GET_CITIES_BY_COUNTRY_URL = API_BASE + "/api/City/GetCityByCountryID";
+        const ADD_CITY_URL = API_BASE + "/api/City/AddNewCity";
+        const UPDATE_CITY_URL = API_BASE + "/api/City/UpdateCity";
+        const DELETE_CITY_URL = API_BASE + "/api/City/DeleteCityByCityID";
+
+        const GET_COUNTRIES_URL = API_BASE + "/api/Country/GetAllCountries";
+
+        let citiesCache = [];
+        let countriesCache = [];
+        let currentMode = "add";
+        let editCityId = null;
+
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.textContent = msg;
+            box.style.display = "block";
+        }
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        function fillCountriesDropdowns() {
+            const addSelect = document.getElementById("cityCountry");
+            const filterSelect = document.getElementById("filterCountry");
+
+            addSelect.innerHTML = `<option value="">اختر دولة...</option>`;
+            filterSelect.innerHTML = `<option value="">اختر دولة لعرض مدنها...</option>`;
+
+            countriesCache.forEach(c => {
+                const id = c.countryID ?? c.CountryID;
+                const name = c.countryName ?? c.CountryName ?? "";
+
+                const opt1 = document.createElement("option");
+                opt1.value = id;
+                opt1.textContent = `${name} (ID: ${id})`;
+                addSelect.appendChild(opt1);
+
+                const opt2 = document.createElement("option");
+                opt2.value = id;
+                opt2.textContent = `${name} (ID: ${id})`;
+                filterSelect.appendChild(opt2);
+            });
+        }
+
+        async function loadCountries() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            try {
+                const data = await fetchAny(GET_COUNTRIES_URL, { headers: authHeaders() }, "GetAllCountries");
+                if (data == null) return;
+                countriesCache = Array.isArray(data) ? data : [data];
+                fillCountriesDropdowns();
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب قائمة الدول من الخادم.");
+            }
+        }
+
+        function getSelectedCountryName(countryId) {
+            const c = countriesCache.find(x => (x.countryID ?? x.CountryID) == countryId);
+            return (c && (c.countryName ?? c.CountryName)) ? (c.countryName ?? c.CountryName) : "";
+        }
+
+        function renderCitiesTable(selectedCountryId) {
+            const tbody = document.querySelector("#citiesTable tbody");
+            tbody.innerHTML = "";
+
+            const countryName = getSelectedCountryName(selectedCountryId);
+
+            if (!citiesCache || citiesCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4">لا توجد مدن لهذه الدولة.</td></tr>`;
+                return;
+            }
+
+            citiesCache.forEach((c, idx) => {
+                const id = c.cityID ?? c.CityID;
+                const name = c.cityName ?? c.CityName ?? "";
+
+
+                const countryObj = c.country || c.Country || null;
+                const countryNameFromApi = countryObj ? (countryObj.countryName ?? countryObj.CountryName ?? "") : "";
+                const finalCountryName = countryNameFromApi || countryName || "";
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td>${name} <span class="small-text">(ID: ${id})</span></td>
+                <td>${finalCountryName}</td>
+                <td>
+                    <button style="padding:4px 8px;font-size:12px;" onclick="openEditModal(${idx})">تعديل</button>
+                    <button class="danger" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="deleteCity(${id})">حذف</button>
+                </td>
+            `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadCitiesBySelectedCountry() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const countryId = parseInt(document.getElementById("filterCountry").value || "0", 10);
+            const tbody = document.querySelector("#citiesTable tbody");
+
+            if (!countryId) {
+                citiesCache = [];
+                tbody.innerHTML = `<tr><td colspan="4" class="small-text">اختر دولة أولاً لعرض المدن.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="4">جاري تحميل المدن...</td></tr>`;
+
+            try {
+                const url = GET_CITIES_BY_COUNTRY_URL + "?CountryID=" + encodeURIComponent(countryId);
+                const data = await fetchAny(url, { headers: authHeaders() }, "GetCityByCountryID");
+                if (data == null) return;
+
+                citiesCache = Array.isArray(data) ? data : [data];
+                renderCitiesTable(countryId);
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب المدن لهذه الدولة.");
+                tbody.innerHTML = `<tr><td colspan="4">تعذر تحميل البيانات.</td></tr>`;
+            }
+        }
+
+        function openAddModal() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            currentMode = "add";
+            editCityId = null;
+
+            document.getElementById("modalTitle").textContent = "إضافة مدينة جديدة";
+            document.getElementById("cityName").value = "";
+
+            // افتراضياً خلي دولة الإضافة نفس دولة الفلترة إذا مختارة
+            const filterCountry = document.getElementById("filterCountry").value;
+            document.getElementById("cityCountry").value = filterCountry || "";
+
+            document.getElementById("cityModal").style.display = "flex";
+        }
+
+        function openEditModal(index) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            currentMode = "edit";
+
+            const c = citiesCache[index];
+            if (!c) { showError("تعذر العثور على هذه المدينة."); return; }
+
+            const id = c.cityID ?? c.CityID;
+            const name = c.cityName ?? c.CityName ?? "";
+
+            // إذا الـ API بيرجع Country object
+            const countryObj = c.country || c.Country || {};
+            const countryIDFromApi = countryObj.countryID ?? countryObj.CountryID ?? null;
+
+            // إذا ما رجع CountryID ضمن object، خذها من الفلتر المختار
+            const fallbackCountryId = parseInt(document.getElementById("filterCountry").value || "0", 10);
+            const countryID = countryIDFromApi || fallbackCountryId || "";
+
+            editCityId = id;
+
+            document.getElementById("modalTitle").textContent = `تعديل مدينة (ID: ${id})`;
+            document.getElementById("cityName").value = name;
+            document.getElementById("cityCountry").value = countryID;
+
+            document.getElementById("cityModal").style.display = "flex";
+        }
+
+        function closeModal() { document.getElementById("cityModal").style.display = "none"; }
+
+        async function saveCity() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const name = document.getElementById("cityName").value.trim();
+            const countryID = parseInt(document.getElementById("cityCountry").value || "0", 10);
+
+            if (!name) { showError("اسم المدينة مطلوب."); return; }
+            if (!countryID) { showError("اختر الدولة."); return; }
+
+            try {
+                if (currentMode === "add") {
+                    const url = new URL(ADD_CITY_URL);
+                    url.searchParams.append("CityName", name);
+                    url.searchParams.append("CountryID", countryID);
+
+                    await fetchAny(url, { method: "POST", headers: authHeaders() }, "AddNewCity");
+                } else {
+                    if (!editCityId) { showError("تعذر تحديد المدينة للتعديل."); return; }
+
+                    const url = new URL(UPDATE_CITY_URL);
+                    url.searchParams.append("CityID", editCityId);
+                    url.searchParams.append("CityName", name);
+                    url.searchParams.append("CountryID", countryID);
+
+                    await fetchAny(url, { method: "PUT", headers: authHeaders() }, "UpdateCity");
+                }
+
+                closeModal();
+
+                // بعد الحفظ: خلي الفلتر على نفس دولة الإضافة واعمل تحميل
+                document.getElementById("filterCountry").value = String(countryID);
+                loadCitiesBySelectedCountry();
+            } catch (err) {
+                console.error(err);
+                showError("فشل الحفظ. راجع Console للتفاصيل.");
+            }
+        }
+
+        async function deleteCity(id) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            if (!confirm("هل أنت متأكد من حذف هذه المدينة؟")) return;
+
+            try {
+                const url = new URL(DELETE_CITY_URL);
+                url.searchParams.append("CityID", id);
+
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteCity");
+                loadCitiesBySelectedCountry();
+            } catch (err) {
+                console.error(err);
+                showError("فشل حذف المدينة. راجع Console للتفاصيل.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!requireAuthOrRedirect()) return;
+            loadCountries();
+            const tbody = document.querySelector("#citiesTable tbody");
+            tbody.innerHTML = `<tr><td colspan="4" class="small-text">اختر دولة أولاً لعرض المدن.</td></tr>`;
+        });
+    </script>
+</body>
+
+</html>

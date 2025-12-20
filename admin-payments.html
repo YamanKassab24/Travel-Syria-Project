@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة المدفوعات - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-failed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-refunded {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-cancelled {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .modal-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        <div class="content">
+            <h1>إدارة المدفوعات</h1>
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>مدفوعات حجز معيّن</h2>
+                    <div class="filters">
+                        <label class="small-text">
+                            ReservationID:
+                            <input type="number" id="filterReservationID"
+                                style="width:120px;padding:4px 6px;border-radius:4px;border:1px solid #d1d5db;">
+                        </label>
+                        <button onclick="loadPayments()">تحميل المدفوعات</button>
+                        <button class="secondary" onclick="openAddModal()">إضافة دفعة جديدة</button>
+                    </div>
+                </div>
+
+
+
+                <table id="paymentsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>PaymentID</th>
+                            <th>ReservationID</th>
+                            <th>الزبون</th>
+                            <th>الرحلة</th>
+                            <th>المبلغ</th>
+                            <th>الطريقة</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>تحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="10" class="small-text">أدخل رقم الحجز ثم اضغط "تحميل المدفوعات".</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="paymentModal">
+        <div class="modal">
+            <h2 id="modalTitle">إضافة دفعة جديدة</h2>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="payReservationID">ReservationID</label>
+                    <input type="number" id="payReservationID">
+                </div>
+                <div class="form-group">
+                    <label for="payAmount">المبلغ</label>
+                    <input type="number" id="payAmount" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="payMethod">طريقة الدفع</label>
+                    <input type="text" id="payMethod" placeholder="مثال: Cash, Card...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="payDetails">تفاصيل الدفع</label>
+                <textarea id="payDetails"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="payStatus">الحالة</label>
+                <select id="payStatus">
+                    <option value="0">Pending (0)</option>
+                    <option value="1">Paid (1)</option>
+                    <option value="2">Failed (2)</option>
+                    <option value="3">Refunded (3)</option>
+                    <option value="4">Cancelled (4)</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="savePayment()">حفظ</button>
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+
+        const GET_PAYMENTS_BY_RES = API_BASE + "/api/Payment/GetAllPaymentsByReservationID";
+        const ADD_PAYMENT_URL = API_BASE + "/api/Payment/AddNewPayment";
+        const UPDATE_PAYMENT_URL = API_BASE + "/api/Payment/UpdatePaymentByPaymentID";
+
+        // ===== TOKEN / AUTH =====
+        const TOKEN_KEY = "token";
+
+        function getToken() { return localStorage.getItem(TOKEN_KEY); }
+
+        function requireAuthOrRedirect() {
+            const t = getToken();
+            if (!t) { window.location.href = "login.html"; return false; }
+            return true;
+        }
+
+        function authHeaders(extra = {}) {
+            const t = getToken();
+            return {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${t}`,
+                ...extra
+            };
+        }
+
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? (label + ": ") : "") + txt);
+            }
+
+            const ct = res.headers.get("content-type") || "";
+            if (ct.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+        let paymentsCache = [];
+        let currentMode = "add";
+        let editPaymentId = null;
+
+        const PaymentStatusLabels = {
+            0: { text: "Pending", class: "badge-pending" },
+            1: { text: "Paid", class: "badge-paid" },
+            2: { text: "Failed", class: "badge-failed" },
+            3: { text: "Refunded", class: "badge-refunded" },
+            4: { text: "Cancelled", class: "badge-cancelled" }
+        };
+
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.textContent = msg;
+            box.style.display = "block";
+        }
+
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        function formatDate(dtString) {
+            if (!dtString) return "";
+            const d = new Date(dtString);
+            if (isNaN(d.getTime())) return dtString;
+            return d.toLocaleString("en-GB");
+        }
+
+        function renderPaymentsTable() {
+            const tbody = document.querySelector("#paymentsTable tbody");
+            tbody.innerHTML = "";
+
+            if (!paymentsCache || paymentsCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="small-text">لا توجد مدفوعات لهذا الحجز.</td></tr>`;
+                return;
+            }
+
+            paymentsCache.forEach((p, idx) => {
+                const paymentID = p.paymentID || p.PaymentID;
+                const reservation = p.reservation || p.Reservation || {};
+                const reservationID = reservation.reservationID || reservation.ReservationID;
+
+                const user = reservation.user || reservation.User || {};
+                const person = user.person || user.Person || {};
+                const firstName = person.firstName || person.FirstName || "";
+                const lastName = person.lastName || person.LastName || "";
+                const customerName = (firstName + " " + lastName).trim();
+
+                const trip = reservation.trip || reservation.Trip || {};
+                const depObj = (trip.departureCity || trip.DepartureCity || {});
+                const arrObj = (trip.arrivalCity || trip.ArrivalCity || {});
+                const depCity = depObj.cityName || depObj.CityName || "";
+                const arrCity = arrObj.cityName || arrObj.CityName || "";
+                const route = depCity && arrCity ? `${depCity} → ${arrCity}` : "";
+
+                const amount = p.amount || p.Amount || 0;
+                const method = p.method || p.Method || "";
+                const details = p.paymentDetails || p.PaymentDetails || "";
+                const transDate = p.transactionDate || p.TransactionDate || null;
+
+                let statusVal = p.status;
+                if (typeof statusVal === "string") statusVal = parseInt(statusVal, 10);
+                const statusInfo = PaymentStatusLabels[statusVal] || { text: statusVal, class: "" };
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td>${paymentID}</td>
+                <td>${reservationID ?? ""}</td>
+                <td title="${customerName}">${customerName || "-"}</td>
+                <td title="${route}">${route || "-"}</td>
+                <td>${amount}</td>
+                <td title="${details}">${method || "-"}</td>
+                <td>${formatDate(transDate)}</td>
+                <td><span class="badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                <td>
+                    <button style="padding:4px 8px;font-size:12px;" onclick="openEditModal(${idx})">تعديل</button>
+                </td>
+            `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadPayments() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            const resId = parseInt(document.getElementById("filterReservationID").value || "0", 10);
+            const tbody = document.querySelector("#paymentsTable tbody");
+
+            if (!resId) {
+                tbody.innerHTML = `<tr><td colspan="10" class="small-text">أدخل رقم الحجز أولاً.</td></tr>`;
+                showError("يجب إدخال ReservationID.");
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="10">جاري تحميل المدفوعات...</td></tr>`;
+
+            try {
+                const url = GET_PAYMENTS_BY_RES + "?reservationID=" + encodeURIComponent(resId);
+                const data = await fetchAny(url, { headers: authHeaders() }, "GetAllPaymentsByReservationID");
+                if (data == null) return;
+
+                paymentsCache = Array.isArray(data) ? data : [data];
+                renderPaymentsTable();
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب المدفوعات من الخادم.");
+                tbody.innerHTML = `<tr><td colspan="10" class="small-text">تعذر تحميل البيانات.</td></tr>`;
+            }
+        }
+
+        function openAddModal() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            currentMode = "add";
+            editPaymentId = null;
+
+            document.getElementById("modalTitle").textContent = "إضافة دفعة جديدة";
+
+            const resId = document.getElementById("filterReservationID").value;
+            document.getElementById("payReservationID").value = resId || "";
+            document.getElementById("payReservationID").disabled = false;
+
+            document.getElementById("payAmount").value = "";
+            document.getElementById("payMethod").value = "";
+            document.getElementById("payDetails").value = "";
+            document.getElementById("payStatus").value = "1";
+
+            document.getElementById("paymentModal").style.display = "flex";
+        }
+
+        function openEditModal(index) {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            currentMode = "edit";
+
+            const p = paymentsCache[index];
+            if (!p) { showError("تعذر العثور على هذه الدفعة."); return; }
+
+            const paymentID = p.paymentID || p.PaymentID;
+            const reservation = p.reservation || p.Reservation || {};
+            const reservationID = reservation.reservationID || reservation.ReservationID;
+
+            const amount = p.amount || p.Amount || 0;
+            const method = p.method || p.Method || "";
+            const details = p.paymentDetails || p.PaymentDetails || "";
+            let statusVal = p.status;
+            if (typeof statusVal === "string") statusVal = parseInt(statusVal, 10);
+
+            editPaymentId = paymentID;
+
+            document.getElementById("modalTitle").textContent = `تعديل دفعة (PaymentID: ${paymentID})`;
+            document.getElementById("payReservationID").value = reservationID ?? "";
+            document.getElementById("payReservationID").disabled = true;
+            document.getElementById("payAmount").value = amount;
+            document.getElementById("payMethod").value = method;
+            document.getElementById("payDetails").value = details;
+            document.getElementById("payStatus").value = isNaN(statusVal) ? "0" : String(statusVal);
+
+            document.getElementById("paymentModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("paymentModal").style.display = "none";
+            document.getElementById("payReservationID").disabled = false;
+        }
+
+        async function savePayment() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+
+            const reservationID = parseInt(document.getElementById("payReservationID").value || "0", 10);
+            const amount = parseFloat(document.getElementById("payAmount").value || "0");
+            const method = document.getElementById("payMethod").value.trim();
+            const details = document.getElementById("payDetails").value.trim();
+            const statusVal = parseInt(document.getElementById("payStatus").value || "0", 10);
+
+            if (currentMode === "add" && !reservationID) { showError("ReservationID مطلوب."); return; }
+            if (!amount || amount <= 0) { showError("المبلغ يجب أن يكون أكبر من صفر."); return; }
+
+            try {
+                if (currentMode === "add") {
+                    const body = { reservationID, method, amount, paymentDetails: details, status: statusVal };
+
+                    const txt = await fetchAny(ADD_PAYMENT_URL, {
+                        method: "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(body)
+                    }, "AddNewPayment");
+
+                    if (txt == null) return;
+
+                } else {
+                    if (!editPaymentId) { showError("تعذر تحديد الدفعة للتعديل."); return; }
+
+                    const body = { paymentID: editPaymentId, amount, paymentDetails: details, status: statusVal };
+
+                    const txt = await fetchAny(UPDATE_PAYMENT_URL, {
+                        method: "PUT",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(body)
+                    }, "UpdatePaymentByPaymentID");
+
+                    if (txt == null) return;
+                }
+
+                closeModal();
+                if (document.getElementById("filterReservationID").value) loadPayments();
+
+            } catch (err) {
+                console.error(err);
+                showError("حدث خطأ أثناء الاتصال بالسيرفر أو فشل الحفظ. راجع Console للتفاصيل");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            requireAuthOrRedirect();
+        });
+    </script>
+</body>
+
+</html>

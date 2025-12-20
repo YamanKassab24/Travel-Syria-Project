@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الرحلات - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 13px;
+            min-width: 180px;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button.danger {
+            background: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .badge-status-0 {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .badge-status-1 {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-status-2 {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-status-3 {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            z-index: 9999;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 820px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ✅ صور الرحلة */
+        .img-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+        }
+        .img-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #f3f4f6;
+        }
+        .img-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            gap: 8px;
+        }
+        .img-actions button {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        <div class="content">
+            <h1>إدارة الرحلات</h1>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="filters">
+                <button onclick="openAddModal()">إضافة رحلة جديدة</button>
+                <button class="secondary" onclick="loadTrips()">تحديث القائمة</button>
+
+                <input id="companySearch" type="text" placeholder="بحث باسم الشركة..." />
+
+                <select id="filterDeparture">
+                    <option value="">فلترة: مدينة المغادرة (الكل)</option>
+                </select>
+
+                <select id="filterArrival">
+                    <option value="">فلترة: مدينة الوصول (الكل)</option>
+                </select>
+
+                <input id="priceMin" type="number" step="0.01" placeholder="السعر من" style="min-width:120px;" />
+                <input id="priceMax" type="number" step="0.01" placeholder="السعر إلى" style="min-width:120px;" />
+
+                <button class="secondary" onclick="clearFilters()">مسح الفلاتر</button>
+            </div>
+
+            <table id="tripsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الرحلة (TripID + الشركة)</th>
+                        <th>من</th>
+                        <th>إلى</th>
+                        <th>وقت المغادرة</th>
+                        <th>السعر</th>
+                        <th>المقاعد</th>
+                        <th>الحالة</th>
+                        <th>تحكم</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ✅ Modal إضافة/تعديل الرحلة -->
+    <div class="modal-backdrop" id="tripModal">
+        <div class="modal">
+            <h2 id="modalTitle">إضافة رحلة جديدة</h2>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>الشركة</label>
+                    <select id="companySelect">
+                        <option value="">اختر الشركة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="status">
+                        <option value="0">0 - Pending / Draft</option>
+                        <option value="1">1 - Active</option>
+                        <option value="2">2 - Cancelled</option>
+                        <option value="3">3 - Completed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>بلد المغادرة</label>
+                    <select id="depCountrySelect">
+                        <option value="">اختر بلد المغادرة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>مدينة المغادرة</label>
+                    <select id="depCitySelect" disabled>
+                        <option value="">اختر مدينة المغادرة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>بلد الوصول</label>
+                    <select id="arrCountrySelect">
+                        <option value="">اختر بلد الوصول</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>مدينة الوصول</label>
+                    <select id="arrCitySelect" disabled>
+                        <option value="">اختر مدينة الوصول</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>وقت المغادرة</label>
+                    <input type="datetime-local" id="departureTime">
+                </div>
+
+                <div class="form-group">
+                    <label>وقت الوصول</label>
+                    <input type="datetime-local" id="arrivalTime">
+                </div>
+
+                <div class="form-group">
+                    <label>السعر</label>
+                    <input type="number" step="0.01" id="price">
+                </div>
+
+                <div class="form-group">
+                    <label>عدد المقاعد الكلي (MaxSeats)</label>
+                    <input type="number" id="maxSeats" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>التقييم (اختياري)</label>
+                    <input type="number" id="rating" min="0" max="5">
+                </div>
+
+                <div class="form-group" style="grid-column: 1/-1;">
+                    <label>تفاصيل الرحلة</label>
+                    <textarea id="details"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="saveTrip()">حفظ</button>
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Modal صور الرحلة -->
+    <div class="modal-backdrop" id="imagesModal">
+        <div class="modal" style="max-width:900px;">
+            <h2>صور الرحلة</h2>
+
+            <div id="imagesError" class="error-box" style="display:none;"></div>
+
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+                <input type="file" id="tripImageFile" accept="image/*" />
+                <button onclick="uploadTripImage()">رفع الصورة</button>
+
+                <button class="danger" onclick="deleteAllTripImages()">حذف كل الصور</button>
+
+                <button class="secondary" onclick="closeImagesModal()">إغلاق</button>
+
+                <div class="small-text" id="imagesTripInfo" style="margin-right:auto;"></div>
+            </div>
+
+            <div id="imagesGrid"
+                style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+        const TOKEN_KEY = "token";
+
+        const GET_TRIPS_URL = API_BASE + "/api/Trip/GetAllTrips";
+        const ADD_TRIP_URL = API_BASE + "/api/Trip/AddNewTrip";
+        const UPDATE_TRIP_URL = API_BASE + "/api/Trip/UpdateTrip";
+        const DELETE_TRIP_URL = API_BASE + "/api/Trip/DeletTripByTripID";
+
+        const GET_COUNTRIES_URL = API_BASE + "/api/Country/GetAllCountries";
+        const GET_CITIES_BY_COUNTRY_URL = API_BASE + "/api/City/GetCityByCountryID";
+        const GET_COMPANIES_URL = API_BASE + "/api/Company/GetAllCompanies";
+
+        // ✅ Trip Images API (حسب swagger عندك)
+        const GET_TRIP_IMAGES_URL = API_BASE + "/api/TripImage/GetAllTripImages";             // /{tripId}
+        const UPLOAD_TRIP_IMAGE_URL = API_BASE + "/api/TripImage/Upload";                     // ?TripID=...
+        const DELETE_TRIP_IMAGE_URL = API_BASE + "/api/TripImage/DelteImageTripByImageID";    // ?ImageID=...
+        const DELETE_ALL_TRIP_IMAGES_URL = API_BASE + "/api/TripImage/DelteImageTripByTripID";// ?TripID=...
+
+        let currentMode = "add";
+        let editTripId = null;
+
+        let loadedTrips = [];
+        let loadedCompanies = [];
+        let loadedCountries = [];
+
+        let depCities = [];
+        let arrCities = [];
+
+        const statusLabels = ["Pending", "Active", "Cancelled", "Completed"];
+
+        const els = {
+            errorBox: document.getElementById("errorBox"),
+            tbody: document.querySelector("#tripsTable tbody"),
+
+            companySearch: document.getElementById("companySearch"),
+            filterDeparture: document.getElementById("filterDeparture"),
+            filterArrival: document.getElementById("filterArrival"),
+            priceMin: document.getElementById("priceMin"),
+            priceMax: document.getElementById("priceMax"),
+
+            modal: document.getElementById("tripModal"),
+            modalTitle: document.getElementById("modalTitle"),
+
+            companySelect: document.getElementById("companySelect"),
+            status: document.getElementById("status"),
+
+            depCountry: document.getElementById("depCountrySelect"),
+            depCity: document.getElementById("depCitySelect"),
+            arrCountry: document.getElementById("arrCountrySelect"),
+            arrCity: document.getElementById("arrCitySelect"),
+
+            departureTime: document.getElementById("departureTime"),
+            arrivalTime: document.getElementById("arrivalTime"),
+            price: document.getElementById("price"),
+            maxSeats: document.getElementById("maxSeats"),
+            rating: document.getElementById("rating"),
+            details: document.getElementById("details")
+        };
+
+        function showError(msg) { els.errorBox.textContent = msg; els.errorBox.style.display = "block"; }
+        function clearError() { els.errorBox.textContent = ""; els.errorBox.style.display = "none"; }
+
+        function getToken() { return localStorage.getItem(TOKEN_KEY); }
+        function requireAuthOrRedirect() {
+            const token = getToken();
+            if (!token) { window.location.href = "login.html"; return false; }
+            return true;
+        }
+
+        function authHeaders(extra = {}) {
+            const token = getToken();
+            return { "Accept": "application/json", "Authorization": `Bearer ${token}`, ...extra };
+        }
+
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? (label + ": ") : "") + txt);
+            }
+            const ct = res.headers.get("content-type") || "";
+            if (ct.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+        function formatDateTime(dtString) {
+            if (!dtString) return "";
+            const d = new Date(dtString);
+            if (isNaN(d.getTime())) return dtString;
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            const h = String(d.getHours()).padStart(2, "0");
+            const m = String(d.getMinutes()).padStart(2, "0");
+            return `${h}:${m} ${year}-${month}-${day}`;
+        }
+
+        function formatDateTimeForInput(dtString) {
+            if (!dtString) return "";
+            const d = new Date(dtString);
+            if (isNaN(d.getTime())) return "";
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            const hh = String(d.getHours()).padStart(2, "0");
+            const mi = String(d.getMinutes()).padStart(2, "0");
+            return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+        }
+
+        function createStatusBadge(statusValue) {
+            const idx = Number(statusValue) || 0;
+            const label = statusLabels[idx] || ("Status " + idx);
+            return `<span class="badge badge-status-${idx}">${label}</span>`;
+        }
+
+        function normalize(s) { return (s ?? "").toString().trim().toLowerCase(); }
+
+        function getTripCompanyName(t) {
+            const c = t.company || t.Company || {};
+            return c.companyName || c.CompanyName || "";
+        }
+        function getTripDepCityName(t) {
+            const c = t.departureCity || t.DepartureCity || {};
+            return c.cityName || c.CityName || "";
+        }
+        function getTripArrCityName(t) {
+            const c = t.arrivalCity || t.ArrivalCity || {};
+            return c.cityName || c.CityName || "";
+        }
+        function getTripPrice(t) {
+            return Number(t.price ?? t.Price ?? 0);
+        }
+
+        function applyFilters(trips) {
+            const qCompany = normalize(els.companySearch.value);
+            const depFilter = normalize(els.filterDeparture.value);
+            const arrFilter = normalize(els.filterArrival.value);
+            const min = els.priceMin.value === "" ? null : Number(els.priceMin.value);
+            const max = els.priceMax.value === "" ? null : Number(els.priceMax.value);
+
+            return trips.filter(t => {
+                const companyName = normalize(getTripCompanyName(t));
+                const depName = normalize(getTripDepCityName(t));
+                const arrName = normalize(getTripArrCityName(t));
+                const price = getTripPrice(t);
+
+                if (qCompany && !companyName.includes(qCompany)) return false;
+                if (depFilter && depName !== depFilter) return false;
+                if (arrFilter && arrName !== arrFilter) return false;
+                if (min != null && price < min) return false;
+                if (max != null && price > max) return false;
+
+                return true;
+            });
+        }
+
+        function rebuildFilterLists() {
+            const depSet = new Set();
+            const arrSet = new Set();
+            loadedTrips.forEach(t => {
+                const dep = getTripDepCityName(t).trim();
+                const arr = getTripArrCityName(t).trim();
+                if (dep) depSet.add(dep);
+                if (arr) arrSet.add(arr);
+            });
+
+            const curDep = els.filterDeparture.value;
+            const curArr = els.filterArrival.value;
+
+            els.filterDeparture.innerHTML = `<option value="">فلترة: مدينة المغادرة (الكل)</option>`;
+            Array.from(depSet).sort((a, b) => a.localeCompare(b, "ar")).forEach(name => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                opt.textContent = name;
+                els.filterDeparture.appendChild(opt);
+            });
+
+            els.filterArrival.innerHTML = `<option value="">فلترة: مدينة الوصول (الكل)</option>`;
+            Array.from(arrSet).sort((a, b) => a.localeCompare(b, "ar")).forEach(name => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                opt.textContent = name;
+                els.filterArrival.appendChild(opt);
+            });
+
+            if (curDep) els.filterDeparture.value = curDep;
+            if (curArr) els.filterArrival.value = curArr;
+        }
+
+        function renderTripsTable() {
+            const trips = applyFilters(loadedTrips);
+            els.tbody.innerHTML = "";
+
+            if (!trips || trips.length === 0) {
+                els.tbody.innerHTML = `<tr><td colspan="9">لا توجد نتائج مطابقة.</td></tr>`;
+                return;
+            }
+
+            trips.forEach((t, idx) => {
+                const tripID = t.tripID || t.TripID;
+
+                const companyName = getTripCompanyName(t);
+                const fromCity = getTripDepCityName(t);
+                const toCity = getTripArrCityName(t);
+
+                const departureTime = t.departureTime || t.DepartureTime;
+                const price = t.price || t.Price || 0;
+                const seatsAvail = t.seatsAvailable || t.SeatsAvailable || 0;
+                const maxSeats = t.maxSeats || t.MaxSeats || 0;
+                const status = t.status || t.Status || 0;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>
+                        ${companyName}
+                        <div class="small-text">Trip ID: ${tripID}</div>
+                    </td>
+                    <td>${fromCity}</td>
+                    <td>${toCity}</td>
+                    <td>${formatDateTime(departureTime)}</td>
+                    <td>${price}</td>
+                    <td>${seatsAvail}/${maxSeats}</td>
+                    <td>${createStatusBadge(status)}</td>
+                    <td>
+                        <button style="padding:4px 8px;font-size:12px;" onclick="openEditModalById(${tripID})">تعديل</button>
+                        <button class="danger" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="deleteTrip(${tripID})">حذف</button>
+                        <button class="secondary" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="openImagesModal(${tripID})">الصور</button>
+                    </td>
+                `;
+                els.tbody.appendChild(tr);
+            });
+        }
+
+        async function loadTrips() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            els.tbody.innerHTML = `<tr><td colspan="9">جاري تحميل البيانات...</td></tr>`;
+
+            try {
+                const data = await fetchAny(GET_TRIPS_URL, { headers: authHeaders() }, "GetAllTrips");
+                if (data == null) return;
+                loadedTrips = Array.isArray(data) ? data : [data];
+                rebuildFilterLists();
+                renderTripsTable();
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب بيانات الرحلات من الخادم.");
+            }
+        }
+
+        async function loadCompanies() {
+            const data = await fetchAny(GET_COMPANIES_URL, { headers: authHeaders() }, "GetAllCompanies");
+            if (data == null) return;
+            loadedCompanies = Array.isArray(data) ? data : [data];
+
+            els.companySelect.innerHTML = `<option value="">اختر الشركة</option>`;
+            loadedCompanies.forEach(c => {
+                const id = c.companyID || c.CompanyID;
+                const name = c.companyName || c.CompanyName || "";
+                if (id != null) {
+                    const opt = document.createElement("option");
+                    opt.value = id;
+                    opt.textContent = `#${id} - ${name}`;
+                    els.companySelect.appendChild(opt);
+                }
+            });
+        }
+
+        async function loadCountries() {
+            const data = await fetchAny(GET_COUNTRIES_URL, { headers: authHeaders() }, "GetAllCountries");
+            if (data == null) return;
+            loadedCountries = Array.isArray(data) ? data : [data];
+
+            const fill = (selectEl, placeholder) => {
+                selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+                loadedCountries.forEach(c => {
+                    const id = c.countryID || c.CountryID;
+                    const name = c.countryName || c.CountryName || "";
+                    if (id != null) {
+                        const opt = document.createElement("option");
+                        opt.value = id;
+                        opt.textContent = name;
+                        selectEl.appendChild(opt);
+                    }
+                });
+            };
+
+            fill(els.depCountry, "اختر بلد المغادرة");
+            fill(els.arrCountry, "اختر بلد الوصول");
+        }
+
+        async function loadCitiesForCountry(countryId, citySelectEl, holderArraySetter) {
+            holderArraySetter([]);
+            citySelectEl.disabled = true;
+            citySelectEl.innerHTML = `<option value="">اختر المدينة</option>`;
+            if (!countryId) return;
+
+            const url = GET_CITIES_BY_COUNTRY_URL + "?CountryID=" + encodeURIComponent(countryId);
+            const data = await fetchAny(url, { headers: authHeaders() }, "GetCityByCountryID");
+            if (data == null) return;
+
+            const cities = Array.isArray(data) ? data : [data];
+            holderArraySetter(cities);
+
+            cities.forEach(city => {
+                const id = city.cityID || city.CityID;
+                const name = city.cityName || city.CityName || "";
+                if (id != null) {
+                    const opt = document.createElement("option");
+                    opt.value = id;
+                    opt.textContent = name;
+                    citySelectEl.appendChild(opt);
+                }
+            });
+
+            citySelectEl.disabled = false;
+        }
+
+        function openAddModal() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            currentMode = "add";
+            editTripId = null;
+
+            els.modalTitle.textContent = "إضافة رحلة جديدة";
+
+            els.companySelect.value = "";
+            els.status.value = "1";
+
+            els.depCountry.value = "";
+            els.depCity.innerHTML = `<option value="">اختر مدينة المغادرة</option>`;
+            els.depCity.disabled = true;
+
+            els.arrCountry.value = "";
+            els.arrCity.innerHTML = `<option value="">اختر مدينة الوصول</option>`;
+            els.arrCity.disabled = true;
+
+            els.departureTime.value = "";
+            els.arrivalTime.value = "";
+            els.price.value = "";
+            els.maxSeats.value = "";
+            els.rating.value = "";
+            els.details.value = "";
+
+            els.modal.style.display = "flex";
+        }
+
+        function openEditModalById(tripId) {
+            const index = loadedTrips.findIndex(t => (t.tripID || t.TripID) === tripId);
+            openEditModal(index);
+        }
+
+        async function openEditModal(index) {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            currentMode = "edit";
+
+            const t = loadedTrips[index];
+            if (!t) { showError("تعذر العثور على بيانات هذه الرحلة"); return; }
+
+            editTripId = t.tripID || t.TripID;
+            els.modalTitle.textContent = "تعديل رحلة";
+
+            const companyObj = t.company || t.Company || {};
+            const companyID = companyObj.companyID || companyObj.CompanyID || t.companyID || t.CompanyID || "";
+            els.companySelect.value = companyID ? String(companyID) : "";
+
+            const depCityObj = t.departureCity || t.DepartureCity || {};
+            const arrCityObj = t.arrivalCity || t.ArrivalCity || {};
+
+            const depCityID = depCityObj.cityID || depCityObj.CityID || t.departureCityID || t.DepartureCityID || "";
+            const arrCityID = arrCityObj.cityID || arrCityObj.CityID || t.arrivalCityID || t.ArrivalCityID || "";
+
+            const depCountryID = depCityObj.countryID || depCityObj.CountryID || "";
+            const arrCountryID = arrCityObj.countryID || arrCityObj.CountryID || "";
+
+            els.depCountry.value = depCountryID ? String(depCountryID) : "";
+            await loadCitiesForCountry(els.depCountry.value, els.depCity, (v) => depCities = v);
+            if (depCityID) els.depCity.value = String(depCityID);
+
+            els.arrCountry.value = arrCountryID ? String(arrCountryID) : "";
+            await loadCitiesForCountry(els.arrCountry.value, els.arrCity, (v) => arrCities = v);
+            if (arrCityID) els.arrCity.value = String(arrCityID);
+
+            els.departureTime.value = formatDateTimeForInput(t.departureTime || t.DepartureTime);
+            els.arrivalTime.value = formatDateTimeForInput(t.arrivalTime || t.ArrivalTime);
+
+            els.price.value = t.price || t.Price || "";
+            els.maxSeats.value = t.maxSeats || t.MaxSeats || "";
+            els.status.value = String(t.status || t.Status || 0);
+
+            const ratingVal = (t.rating ?? t.Rating ?? "");
+            els.rating.value = ratingVal === null ? "" : ratingVal;
+
+            els.details.value = t.details || t.Details || "";
+
+            els.modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            els.modal.style.display = "none";
+        }
+
+        function getDateTimeFromInput(el) {
+            const val = el.value;
+            if (!val) return new Date().toISOString();
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return new Date().toISOString();
+            return d.toISOString();
+        }
+
+        async function saveTrip() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const companyID = parseInt(els.companySelect.value || "0", 10);
+            const depCountryID = parseInt(els.depCountry.value || "0", 10);
+            const arrCountryID = parseInt(els.arrCountry.value || "0", 10);
+
+            const departureCityID = parseInt(els.depCity.value || "0", 10);
+            const arrivalCityID = parseInt(els.arrCity.value || "0", 10);
+
+            const price = parseFloat(els.price.value || "0");
+            const maxSeats = parseInt(els.maxSeats.value || "0", 10);
+            const status = parseInt(els.status.value || "0", 10);
+
+            const ratingRaw = els.rating.value;
+            const rating = ratingRaw === "" ? null : parseInt(ratingRaw, 10);
+            const details = els.details.value.trim();
+
+            if (!companyID) { showError("الرجاء اختيار الشركة."); return; }
+            if (!depCountryID) { showError("الرجاء اختيار بلد المغادرة."); return; }
+            if (!arrCountryID) { showError("الرجاء اختيار بلد الوصول."); return; }
+            if (!departureCityID) { showError("الرجاء اختيار مدينة المغادرة."); return; }
+            if (!arrivalCityID) { showError("الرجاء اختيار مدينة الوصول."); return; }
+            if (!price || !maxSeats) { showError("السعر و MaxSeats حقول مطلوبة."); return; }
+
+            const payload = {
+                companyID: companyID,
+                departureCityID: departureCityID,
+                arrivalCityID: arrivalCityID,
+                departureTime: getDateTimeFromInput(els.departureTime),
+                arrivalTime: getDateTimeFromInput(els.arrivalTime),
+                price: price,
+                status: status,
+                details: details || null,
+                rating: rating,
+                maxSeats: maxSeats
+            };
+
+            try {
+                if (currentMode === "add") {
+                    await fetchAny(ADD_TRIP_URL, {
+                        method: "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }, "AddNewTrip");
+                } else {
+                    if (!editTripId) { showError("تعذر تحديد الرحلة للتعديل"); return; }
+
+                    const url = UPDATE_TRIP_URL + "?TripID=" + encodeURIComponent(editTripId);
+                    await fetchAny(url, {
+                        method: "PUT",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }, "UpdateTrip");
+                }
+
+                closeModal();
+                await loadTrips();
+            } catch (err) {
+                console.error(err);
+                showError("فشل حفظ الرحلة. راجع Console");
+            }
+        }
+
+        async function deleteTrip(tripId) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            if (!confirm("هل أنت متأكد من حذف هذه الرحلة؟")) return;
+
+            try {
+                const url = DELETE_TRIP_URL + "?TripID=" + encodeURIComponent(tripId);
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteTrip");
+                await loadTrips();
+            } catch (err) {
+                console.error(err);
+                showError("فشل حذف الرحلة. راجع Console.");
+            }
+        }
+
+        function clearFilters() {
+            els.companySearch.value = "";
+            els.filterDeparture.value = "";
+            els.filterArrival.value = "";
+            els.priceMin.value = "";
+            els.priceMax.value = "";
+            renderTripsTable();
+        }
+
+        function wireFilters() {
+            els.companySearch.addEventListener("input", renderTripsTable);
+            els.filterDeparture.addEventListener("change", renderTripsTable);
+            els.filterArrival.addEventListener("change", renderTripsTable);
+            els.priceMin.addEventListener("input", renderTripsTable);
+            els.priceMax.addEventListener("input", renderTripsTable);
+        }
+
+        function wireCountryCity() {
+            els.depCountry.addEventListener("change", async () => {
+                await loadCitiesForCountry(els.depCountry.value, els.depCity, (v) => depCities = v);
+                els.depCity.value = "";
+            });
+
+            els.arrCountry.addEventListener("change", async () => {
+                await loadCitiesForCountry(els.arrCountry.value, els.arrCity, (v) => arrCities = v);
+                els.arrCity.value = "";
+            });
+        }
+
+        // ====================== ✅ Trip Images ======================
+        let imagesTripId = null;
+
+        function showImagesError(msg) {
+            const el = document.getElementById("imagesError");
+            el.textContent = msg;
+            el.style.display = "block";
+        }
+        function clearImagesError() {
+            const el = document.getElementById("imagesError");
+            el.textContent = "";
+            el.style.display = "none";
+        }
+
+        function openImagesModal(tripId) {
+            if (!requireAuthOrRedirect()) return;
+            imagesTripId = tripId;
+
+            document.getElementById("imagesTripInfo").textContent = `Trip ID: ${tripId}`;
+            document.getElementById("tripImageFile").value = "";
+            document.getElementById("imagesModal").style.display = "flex";
+            loadTripImages(tripId);
+        }
+
+        function closeImagesModal() {
+            document.getElementById("imagesModal").style.display = "none";
+            imagesTripId = null;
+        }
+
+        function normalizeTripImagesResponse(data) {
+            if (data == null) return [];
+            if (Array.isArray(data)) return data;
+            if (Array.isArray(data.images)) return data.images;
+            if (Array.isArray(data.data)) return data.data;
+            return [data];
+        }
+
+        function buildImageUrlFromFileName(fileName) {
+            return API_BASE + "/api/images/GetImage/" + encodeURIComponent(fileName);
+        }
+
+        async function loadTripImages(tripId) {
+            clearImagesError();
+            const grid = document.getElementById("imagesGrid");
+            grid.innerHTML = `<div class="small-text">جاري تحميل الصور...</div>`;
+
+            try {
+                const url = GET_TRIP_IMAGES_URL + "/" + encodeURIComponent(tripId);
+                const data = await fetchAny(url, { headers: authHeaders() }, "GetAllTripImages");
+                if (data == null) return;
+
+                const images = normalizeTripImagesResponse(data);
+
+                if (!images.length) {
+                    grid.innerHTML = `<div class="small-text">لا توجد صور لهذه الرحلة.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = "";
+
+                images.forEach(img => {
+                    const imageId = img.imageID || img.ImageID || img.id || img.ID;
+
+                    // ممكن يرجع اسم الملف مباشرة أو ضمن object
+                    const fileName =
+                        img.fileName || img.FileName ||
+                        img.imageName || img.ImageName ||
+                        img.image || img.Image ||
+                        (typeof img === "string" ? img : null);
+
+                    const imageUrlDirect = img.imageUrl || img.ImageUrl || img.url || img.Url;
+
+                    const finalUrl = imageUrlDirect
+                        ? imageUrlDirect
+                        : (fileName ? buildImageUrlFromFileName(fileName) : "");
+
+                    const card = document.createElement("div");
+                    card.className = "img-card";
+                    card.innerHTML = `
+                        <img src="${finalUrl}" alt="Trip Image" onerror="this.style.display='none'"/>
+                        <div class="img-actions">
+                            <span class="small-text">#${imageId ?? "-"}</span>
+                            <button class="danger" onclick="deleteTripImage(${imageId})">حذف</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                showImagesError("فشل تحميل الصور. راجع Console وشوف شكل Response تبع GetAllTripImages.");
+                grid.innerHTML = "";
+            }
+        }
+
+        async function uploadTripImage() {
+            if (!requireAuthOrRedirect()) return;
+            clearImagesError();
+
+            if (!imagesTripId) {
+                showImagesError("لم يتم تحديد الرحلة.");
+                return;
+            }
+
+            const fileInput = document.getElementById("tripImageFile");
+            const file = fileInput.files?.[0];
+            if (!file) {
+                showImagesError("اختر صورة أولاً.");
+                return;
+            }
+
+            try {
+                const fd = new FormData();
+                // ✅ حسب Swagger: اسم الحقل imageFile
+                fd.append("imageFile", file);
+
+                const url = UPLOAD_TRIP_IMAGE_URL + "?TripID=" + encodeURIComponent(imagesTripId);
+
+                await fetchAny(url, {
+                    method: "POST",
+                    headers: authHeaders(), // لا تحط Content-Type مع FormData
+                    body: fd
+                }, "TripImage Upload");
+
+                fileInput.value = "";
+                await loadTripImages(imagesTripId);
+
+            } catch (err) {
+                console.error(err);
+                showImagesError("فشل رفع الصورة. تأكد التوكن موجود + endpoint شغال.");
+            }
+        }
+
+        async function deleteTripImage(imageId) {
+            if (!requireAuthOrRedirect()) return;
+            clearImagesError();
+
+            if (!imageId) {
+                showImagesError("تعذر تحديد الصورة للحذف.");
+                return;
+            }
+
+            if (!confirm("متأكد بدك تحذف الصورة؟")) return;
+
+            try {
+                const url = DELETE_TRIP_IMAGE_URL + "?ImageID=" + encodeURIComponent(imageId);
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteTripImage");
+                await loadTripImages(imagesTripId);
+            } catch (err) {
+                console.error(err);
+                showImagesError("فشل حذف الصورة. راجع Console.");
+            }
+        }
+
+        async function deleteAllTripImages() {
+            if (!requireAuthOrRedirect()) return;
+            clearImagesError();
+
+            if (!imagesTripId) {
+                showImagesError("لم يتم تحديد الرحلة.");
+                return;
+            }
+
+            if (!confirm("متأكد بدك تحذف كل صور الرحلة؟")) return;
+
+            try {
+                const url = DELETE_ALL_TRIP_IMAGES_URL + "?TripID=" + encodeURIComponent(imagesTripId);
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteAllTripImages");
+                await loadTripImages(imagesTripId);
+            } catch (err) {
+                console.error(err);
+                showImagesError("فشل حذف كل الصور. راجع Console.");
+            }
+        }
+
+        async function init() {
+            if (!requireAuthOrRedirect()) return;
+
+            wireFilters();
+            wireCountryCity();
+
+            try {
+                await loadCompanies();
+                await loadCountries();
+                await loadTrips();
+            } catch (e) {
+                console.error(e);
+                showError("حدث خطأ أثناء تحميل بيانات الصفحة.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+
+</html>

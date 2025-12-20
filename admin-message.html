@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الرسائل - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        <div class="content">
+            <h1>إدارة الرسائل</h1>
+
+            <div id="alertBox" class="error-box"></div>
+            <table id="Message-Table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>الايميل</th>
+                        <th>الهاتف</th>
+                        <th>الرسالة</th>
+                    </tr>
+                </thead>
+                <tbody id="MessageTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+        const TOKEN_KEY = "token";
+        const GET_MESSAGES_URL = API_BASE + "/api/ContactMessage/GetAllContactMessages";
+
+        const MessageBody = document.getElementById("MessageTableBody");
+        const alertBox = document.getElementById("alertBox");
+
+        let messages = [];
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY);
+        } function requireAuthOrRedirect() {
+            const token = getToken();
+            if (!token) {
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
+        }
+
+        function authHeaders(extra) {
+            const token = getToken();
+            return {
+                "Accept": "application/json",
+                "Authorization": ` Bearer ${token}`,
+                ...extra
+            }
+        }
+
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? label + ": " : "") + txt);
+            }
+
+            const contentType = res.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+        function showAlert(msg) {
+            alertBox.textContent = msg;
+            alertBox.style.display = "block";
+        }
+
+        function clearAlert() {
+            alertBox.textContent = "";
+            alertBox.style.display = "none";
+        }
+
+        async function loadMessages() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearAlert();
+            MessageBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center;color:#6b7280;">
+                            جاري تحميل الرسائل...
+                        </td>
+                    </tr>`
+                ;
+
+            try {
+                const data = await fetchAny(GET_MESSAGES_URL, { headers: authHeaders() }, "تعذر تحميل الرسائل");
+
+                if (!data || data.length === 0) {
+                    MessageBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align:center;">لا توجد رسائل</td>
+                            </tr>`
+                        ;
+                    return;
+                }
+
+                messages = Array.isArray(data) ? data : [data];
+                renderMessagesTable();
+
+            } catch (err) {
+                console.error(err);
+                showAlert("حدث خطأ أثناء تحميل الرسائل");
+            }
+        }
+
+
+        function renderMessagesTable() {
+            MessageBody.innerHTML = "";
+
+            messages.forEach((msg, index) => {
+                MessageBody.innerHTML +=
+                    `<tr>
+                            <td>${index + 1}</td>
+                            <td>${msg.name}</td>
+                            <td>${msg.email}</td>
+                            <td>${msg.phone || "-"}</td>
+                            <td>${msg.message}</td>
+                        </tr>`
+                    ;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadMessages());
+    </script>
+</body>
+
+</html>

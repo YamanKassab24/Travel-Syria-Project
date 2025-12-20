@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الخدمات - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .filters {
+            padding: 0;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button.danger {
+            background: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-inactive {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .inline-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .inline-grid .form-group {
+            margin-bottom: 0;
+        }
+
+        .modal-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .inline-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .inline-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        <div class="content">
+            <h1>إدارة الخدمات</h1>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>الخدمات</h2>
+                    <div class="filters">
+                        <button onclick="openAddModal()">إضافة خدمة جديدة</button>
+                        <button class="secondary" onclick="loadServices()">تحديث القائمة</button>
+                    </div>
+                </div>
+
+
+                <table id="servicesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الخدمة</th>
+                            <th>الوصف</th>
+                            <th>الحالة</th>
+                            <th>تحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>ربط الخدمات بالرحلات</h2>
+                </div>
+
+
+                <div class="inline-grid">
+                    <div class="form-group">
+                        <label for="tsTripID">رقم الرحلة (TripID)</label>
+                        <input type="number" id="tsTripID" placeholder="مثال: 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="tsServiceID">الخدمة</label>
+                        <select id="tsServiceID">
+                            <option value="">اختر خدمة...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tsPrice">السعر</label>
+                        <input type="number" id="tsPrice" step="0.01" placeholder="مثال: 25.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="tsIsActive">الحالة</label>
+                        <select id="tsIsActive">
+                            <option value="true">نشطة</option>
+                            <option value="false">غير نشطة</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <button onclick="loadTripServicesForTrip()">تحميل خدمات الرحلة</button>
+                    <button class="secondary" onclick="addTripService()">إضافة هذه الخدمة للرحلة</button>
+                </div>
+
+                <table id="tripServicesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الخدمة</th>
+                            <th>السعر</th>
+                            <th>الحالة</th>
+                            <th>تحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="small-text">أدخل رقم الرحلة ثم اضغط "تحميل خدمات الرحلة".</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="serviceModal">
+        <div class="modal">
+            <h2 id="modalTitle">إضافة خدمة جديدة</h2>
+
+            <div class="form-group">
+                <label for="serviceName">اسم الخدمة</label>
+                <input type="text" id="serviceName">
+            </div>
+
+            <div class="form-group">
+                <label for="serviceDescription">الوصف</label>
+                <textarea id="serviceDescription"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceIsActive">الحالة</label>
+                <select id="serviceIsActive">
+                    <option value="true">نشطة</option>
+                    <option value="false">غير نشطة</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="saveService()">حفظ</button>
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+
+
+        const TOKEN_KEY = "token";
+        function getToken() { return localStorage.getItem(TOKEN_KEY); }
+        function requireAuthOrRedirect() {
+            const t = getToken();
+            if (!t) { window.location.href = "login.html"; return false; }
+            return true;
+        }
+        function authHeaders(extra = {}) {
+            const t = getToken();
+            return { "Accept": "application/json", "Authorization": `Bearer ${t}`, ...extra };
+        }
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? label + ": " : "") + txt);
+            }
+            const ct = res.headers.get("content-type") || "";
+            if (ct.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+        const GET_SERVICES_URL = API_BASE + "/api/Service/GetAllServices";
+        const ADD_SERVICE_URL = API_BASE + "/api/Service/AddNewService";
+        const UPDATE_SERVICE_URL = API_BASE + "/api/Service/UpdateService";
+        const DELETE_SERVICE_URL = API_BASE + "/api/Service/DeleteServiceWithServiceID";
+
+        const GET_TRIP_SERVICES_BY_TRIP = API_BASE + "/api/TripService/GetTripServicesByTripID";
+        const ADD_TRIP_SERVICE_URL = API_BASE + "/api/TripService/AddNewTripService";
+        const DELETE_TRIP_SERVICE_URL = API_BASE + "/api/TripService/DeleteTripServiceByTripServiceID";
+
+        let servicesCache = [];
+        let tripServicesCache = [];
+        let currentMode = "add";
+        let editServiceId = null;
+
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.textContent = msg;
+            box.style.display = "block";
+        }
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        function renderServicesTable() {
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = "";
+
+            if (!servicesCache || servicesCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5">لا توجد خدمات مسجلة</td></tr>`;
+                return;
+            }
+
+            servicesCache.forEach((s, idx) => {
+                const id = s.serviceID ?? s.ServiceID;
+                const name = s.serviceName ?? s.ServiceName ?? "";
+                const desc = s.description ?? s.Description ?? "";
+                const isActive = (typeof s.isActive !== "undefined") ? s.isActive : s.IsActive;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td>${name} <span class="small-text">(ID: ${id})</span></td>
+                <td>${desc}</td>
+                <td>
+                    <span class="badge ${isActive ? "badge-active" : "badge-inactive"}">
+                        ${isActive ? "نشطة" : "غير نشطة"}
+                    </span>
+                </td>
+                <td>
+                    <button style="padding:4px 8px;font-size:12px;" onclick="openEditModal(${idx})">تعديل</button>
+                    <button class="danger" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="deleteService(${id})">حذف</button>
+                </td>
+            `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function fillTripServiceDropdown() {
+            const select = document.getElementById("tsServiceID");
+            select.innerHTML = `<option value="">اختر خدمة...</option>`;
+
+            servicesCache.forEach(s => {
+                const id = s.serviceID ?? s.ServiceID;
+                const name = s.serviceName ?? s.ServiceName ?? "";
+                const opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = `${name} (ID: ${id})`;
+                select.appendChild(opt);
+            });
+        }
+
+        async function loadServices() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = `<tr><td colspan="5">جاري تحميل البيانات...</td></tr>`;
+
+            try {
+                const data = await fetchAny(GET_SERVICES_URL, { headers: authHeaders() }, "GetAllServices");
+                if (data == null) return;
+
+                servicesCache = Array.isArray(data) ? data : [data];
+                renderServicesTable();
+                fillTripServiceDropdown();
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب بيانات الخدمات من الخادم");
+                tbody.innerHTML = `<tr><td colspan="5">تعذر تحميل البيانات</td></tr>`;
+            }
+        }
+
+        function openAddModal() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            currentMode = "add";
+            editServiceId = null;
+
+            document.getElementById("modalTitle").textContent = "إضافة خدمة جديدة";
+            document.getElementById("serviceName").value = "";
+            document.getElementById("serviceDescription").value = "";
+            document.getElementById("serviceIsActive").value = "true";
+            document.getElementById("serviceModal").style.display = "flex";
+        }
+
+        function openEditModal(index) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            currentMode = "edit";
+
+            const s = servicesCache[index];
+            if (!s) { showError("تعذر العثور على هذه الخدمة"); return; }
+
+            const id = s.serviceID ?? s.ServiceID;
+            const name = s.serviceName ?? s.ServiceName ?? "";
+            const desc = s.description ?? s.Description ?? "";
+            const isActive = (typeof s.isActive !== "undefined") ? s.isActive : s.IsActive;
+
+            editServiceId = id;
+
+            document.getElementById("modalTitle").textContent = `تعديل خدمة (ID: ${id})`;
+            document.getElementById("serviceName").value = name;
+            document.getElementById("serviceDescription").value = desc;
+            document.getElementById("serviceIsActive").value = isActive ? "true" : "false";
+            document.getElementById("serviceModal").style.display = "flex";
+        }
+
+        function closeModal() { document.getElementById("serviceModal").style.display = "none"; }
+
+        async function saveService() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const name = document.getElementById("serviceName").value.trim();
+            const desc = document.getElementById("serviceDescription").value.trim();
+            const isActiveVal = document.getElementById("serviceIsActive").value === "true";
+
+            if (!name) { showError("اسم الخدمة مطلوب."); return; }
+
+            try {
+                if (currentMode === "add") {
+                    const url = new URL(ADD_SERVICE_URL);
+                    url.searchParams.append("ServiceName", name);
+                    url.searchParams.append("Description", desc);
+                    url.searchParams.append("IsActive", isActiveVal);
+
+                    await fetchAny(url, { method: "POST", headers: authHeaders() }, "AddNewService");
+                } else {
+                    if (!editServiceId) { showError("تعذر تحديد الخدمة للتعديل"); return; }
+
+                    const url = new URL(UPDATE_SERVICE_URL);
+                    url.searchParams.append("ServiceID", editServiceId);
+                    url.searchParams.append("ServiceName", name);
+                    url.searchParams.append("Description", desc);
+                    url.searchParams.append("IsActive", isActiveVal);
+
+                    await fetchAny(url, { method: "PUT", headers: authHeaders() }, "UpdateService");
+                }
+
+                closeModal();
+                loadServices();
+            } catch (err) {
+                console.error(err);
+                showError("فشل الحفظ. راجع Console للتفاصيل");
+            }
+        }
+
+        async function deleteService(id) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            if (!confirm("هل أنت متأكد من حذف هذه الخدمة؟")) return;
+
+            try {
+                const url = new URL(DELETE_SERVICE_URL);
+                url.searchParams.append("ServiceID", id);
+
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteService");
+                loadServices();
+            } catch (err) {
+                console.error(err);
+                showError("فشل حذف الخدمة. راجع Console للتفاصيل.");
+            }
+        }
+
+        // ===== TripService =====
+        function renderTripServicesTable() {
+            const tbody = document.querySelector("#tripServicesTable tbody");
+            tbody.innerHTML = "";
+
+            if (!tripServicesCache || tripServicesCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="small-text">لا توجد خدمات مرتبطة بهذه الرحلة</td></tr>`;
+                return;
+            }
+
+            tripServicesCache.forEach((ts, idx) => {
+                const tsId = ts.tripServiceID ?? ts.TripServiceID;
+                const price = ts.price ?? ts.Price ?? 0;
+                const isActive = (typeof ts.isActive !== "undefined") ? ts.isActive : ts.IsActive;
+
+                const svc = ts.service || ts.Service || {};
+                const svcId = svc.serviceID ?? svc.ServiceID;
+                const svcName = svc.serviceName ?? svc.ServiceName ?? "";
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td>${svcName} <span class="small-text">(ID: ${svcId})</span></td>
+                <td>${price}</td>
+                <td>
+                    <span class="badge ${isActive ? "badge-active" : "badge-inactive"}">
+                        ${isActive ? "نشطة" : "غير نشطة"}
+                    </span>
+                </td>
+                <td>
+                    <button class="danger" style="padding:4px 8px;font-size:12px;" onclick="deleteTripService(${tsId})">حذف</button>
+                </td>
+            `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadTripServicesForTrip() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const tripId = parseInt(document.getElementById("tsTripID").value || "0", 10);
+            if (!tripId) { showError("أدخل رقم الرحلة أولاً."); return; }
+
+            const tbody = document.querySelector("#tripServicesTable tbody");
+            tbody.innerHTML = `<tr><td colspan="5">جاري تحميل خدمات الرحلة...</td></tr>`;
+
+            try {
+                const url = GET_TRIP_SERVICES_BY_TRIP + "?TripID=" + encodeURIComponent(tripId);
+                const data = await fetchAny(url, { headers: authHeaders() }, "GetTripServicesByTripID");
+                if (data == null) return;
+
+                tripServicesCache = Array.isArray(data) ? data : [data];
+                renderTripServicesTable();
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب خدمات هذه الرحلة من الخادم.");
+                tbody.innerHTML = `<tr><td colspan="5" class="small-text">تعذر تحميل خدمات هذه الرحلة.</td></tr>`;
+            }
+        }
+
+        async function addTripService() {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+
+            const tripId = parseInt(document.getElementById("tsTripID").value || "0", 10);
+            const svcId = parseInt(document.getElementById("tsServiceID").value || "0", 10);
+            const price = parseFloat(document.getElementById("tsPrice").value || "0");
+            const isActive = document.getElementById("tsIsActive").value === "true";
+
+            if (!tripId) { showError("رقم الرحلة (TripID) مطلوب."); return; }
+            if (!svcId) { showError("اختر خدمة أولاً."); return; }
+
+            try {
+                const body = { tripID: tripId, serviceID: svcId, price: price, isActive: isActive };
+
+                await fetchAny(ADD_TRIP_SERVICE_URL, {
+                    method: "POST",
+                    headers: authHeaders({ "Content-Type": "application/json" }),
+                    body: JSON.stringify(body)
+                }, "AddNewTripService");
+
+                loadTripServicesForTrip();
+            } catch (err) {
+                console.error(err);
+                showError("فشل ربط الخدمة بالرحلة. راجع Console للتفاصيل.");
+            }
+        }
+
+        async function deleteTripService(tsId) {
+            if (!requireAuthOrRedirect()) return;
+            clearError();
+            if (!confirm("هل أنت متأكد من حذف هذه الخدمة من الرحلة؟")) return;
+
+            try {
+                const url = DELETE_TRIP_SERVICE_URL + "?TripServiceID=" + encodeURIComponent(tsId);
+                await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteTripService");
+                loadTripServicesForTrip();
+            } catch (err) {
+                console.error(err);
+                showError("فشل حذف الخدمة من الرحلة. راجع Console للتفاصيل");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!requireAuthOrRedirect()) return;
+            loadServices();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الشركات - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 13px;
+            min-width: 260px;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button.danger {
+            background: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-inactive {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+
+        <div class="content">
+            <h1>إدارة شركات النقل</h1>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="filters">
+                <input id="searchInput" class="search-input" type="text" placeholder="بحث باسم الشركة..." />
+                <button class="secondary" onclick="clearSearch()">مسح البحث</button>
+
+                <button onclick="openAddModal()">إضافة شركة جديدة</button>
+                <button class="secondary" onclick="loadCompanies()">تحديث القائمة</button>
+
+            </div>
+
+            <table id="companiesTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الشركة</th>
+                        <th>الهاتف</th>
+                        <th>العنوان</th>
+                        <th>تاريخ الإنشاء</th>
+                        <th>الحالة</th>
+                        <th>تحكم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="companyModal">
+        <div class="modal">
+            <h2 id="modalTitle">إضافة شركة جديدة</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>اسم الشركة</label>
+                    <input type="text" id="companyName">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف</label>
+                    <input type="text" id="companyPhone">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>العنوان</label>
+                    <input type="text" id="companyAddress">
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="companyIsActive" checked>
+                        <label for="companyIsActive">الشركة مفعّلة</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button onclick="saveCompany()">حفظ</button>
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+        const TOKEN_KEY = "token";
+
+        const GET_COMPANIES_URL = API_BASE + "/api/Company/GetAllCompanies";
+        const ADD_COMPANY_URL = API_BASE + "/api/Company/AddNewCompany";
+        const UPDATE_COMPANY_URL = API_BASE + "/api/Company/UpdateCompany";
+
+
+        let currentMode = "add";
+        let editCompanyId = null;
+        let loadedCompanies = [];
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY);
+        }
+
+        function requireAuthOrRedirect() {
+            const token = getToken();
+            if (!token) {
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
+        }
+
+        function authHeaders(extra = {}) {
+            const token = getToken();
+            return {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`,
+                ...extra
+            };
+        }
+
+        async function fetchAny(url, options = {}, label = "") {
+            const res = await fetch(url, options);
+
+            if (res.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = "login.html";
+                return null;
+            }
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error((label ? (label + ": ") : "") + txt);
+            }
+
+            const contentType = res.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) return await res.json();
+            return await res.text();
+        }
+
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.textContent = msg;
+            box.style.display = "block";
+        }
+
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        function formatDateTime(dtString) {
+            if (!dtString) return "";
+            const d = new Date(dtString);
+            if (isNaN(d.getTime())) return dtString;
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            const h = String(d.getHours()).padStart(2, "0");
+            const m = String(d.getMinutes()).padStart(2, "0");
+            return `${h}:${m} ${year}-${month}-${day}`;
+        }
+
+        function createBadge(isActive) {
+            const active = !!isActive;
+            const cls = active ? "badge badge-active" : "badge badge-inactive";
+            const text = active ? "مفعّلة" : "غير مفعّلة";
+            return `<span class="${cls}">${text}</span>`;
+        }
+
+        async function loadCompanies() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            const tbody = document.querySelector("#companiesTable tbody");
+            tbody.innerHTML = `<tr><td colspan="7">جاري تحميل البيانات...</td></tr>`;
+
+            try {
+                const data = await fetchAny(GET_COMPANIES_URL, {
+                    headers: authHeaders()
+                }, "GetAllCompanies");
+
+                if (data == null) return;
+
+                let companies = Array.isArray(data) ? data : [data];
+                loadedCompanies = companies;
+
+                tbody.innerHTML = "";
+                companies.forEach((c, idx) => {
+                    const id = c.companyID || c.CompanyID;
+                    const name = c.companyName || c.CompanyName || "";
+                    const phone = c.phone || c.Phone || "";
+                    const address = c.address || c.Address || "";
+                    const createdAt = c.createdAt || c.CreatedAt || "";
+                    const isActive = (typeof c.isActive !== "undefined") ? c.isActive : c.IsActive;
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${(id != null ? `#${id} - ` : "")}${name}</td>
+                    <td>${phone}</td>
+                    <td>${address}</td>
+                    <td>${formatDateTime(createdAt)}</td>
+                    <td>${createBadge(isActive)}</td>
+                    <td>
+                        <button style="padding:4px 8px;font-size:12px;" onclick="openEditModal(${idx})">تعديل</button>
+                        <button class="danger" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="softDeleteCompany(${id})">حذف</button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+
+                if (companies.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7">لا توجد شركات مسجلة.</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                showError("فشل جلب بيانات الشركات من الخادم.");
+            }
+        }
+
+        function openAddModal() {
+            clearError();
+            currentMode = "add";
+            editCompanyId = null;
+
+            document.getElementById("modalTitle").textContent = "إضافة شركة جديدة";
+            document.getElementById("companyName").value = "";
+            document.getElementById("companyPhone").value = "";
+            document.getElementById("companyAddress").value = "";
+            document.getElementById("companyIsActive").checked = true;
+
+            document.getElementById("companyModal").style.display = "flex";
+        }
+
+        function openEditModal(index) {
+            clearError();
+            currentMode = "edit";
+
+            const c = loadedCompanies[index];
+            if (!c) {
+                showError("تعذر العثور على بيانات هذه الشركة.");
+                return;
+            }
+
+            const id = c.companyID || c.CompanyID;
+            const name = c.companyName || c.CompanyName || "";
+            const phone = c.phone || c.Phone || "";
+            const address = c.address || c.Address || "";
+            const isActive = (typeof c.isActive !== "undefined") ? c.isActive : c.IsActive;
+
+            editCompanyId = id;
+
+            document.getElementById("modalTitle").textContent = "تعديل شركة";
+            document.getElementById("companyName").value = name;
+            document.getElementById("companyPhone").value = phone;
+            document.getElementById("companyAddress").value = address;
+            document.getElementById("companyIsActive").checked = !!isActive;
+
+            document.getElementById("companyModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("companyModal").style.display = "none";
+        }
+
+        async function saveCompany() {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+
+            const name = document.getElementById("companyName").value.trim();
+            const phone = document.getElementById("companyPhone").value.trim();
+            const address = document.getElementById("companyAddress").value.trim();
+            const isActive = document.getElementById("companyIsActive").checked;
+
+            if (!name) {
+                showError("اسم الشركة حقل مطلوب.");
+                return;
+            }
+
+            const nowIso = new Date().toISOString();
+
+            try {
+                if (currentMode === "add") {
+                    const payload = {
+                        companyID: 0,
+                        companyName: name,
+                        address: address,
+                        phone: phone,
+                        createdAt: nowIso,
+                        isActive: isActive
+                    };
+
+                    await fetchAny(ADD_COMPANY_URL, {
+                        method: "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }, "AddNewCompany");
+                } else {
+                    if (!editCompanyId) {
+                        showError("تعذر تحديد رقم الشركة للتعديل.");
+                        return;
+                    }
+
+                    const payload = {
+                        companyID: editCompanyId,
+                        companyName: name,
+                        address: address,
+                        phone: phone,
+                        isActive: isActive
+                    };
+
+                    await fetchAny(UPDATE_COMPANY_URL, {
+                        method: "PUT",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }, "UpdateCompany");
+                }
+
+                closeModal();
+                loadCompanies();
+            } catch (err) {
+                console.error(err);
+                showError("حدث خطأ أثناء الاتصال بالسيرفر.");
+            }
+        }
+
+
+        async function softDeleteCompany(companyId) {
+            if (!requireAuthOrRedirect()) return;
+
+            clearError();
+            if (!confirm("هل أنت متأكد من تعطيل هذه الشركة؟ (Soft Delete)")) return;
+
+            try {
+                const c = loadedCompanies.find(x => (x.companyID || x.CompanyID) === companyId);
+                if (!c) {
+                    showError("تعذر العثور على بيانات الشركة.");
+                    return;
+                }
+
+                const payload = {
+                    companyID: companyId,
+                    companyName: c.companyName || c.CompanyName || "",
+                    address: c.address || c.Address || "",
+                    phone: c.phone || c.Phone || "",
+                    isActive: false
+                };
+
+                await fetchAny(UPDATE_COMPANY_URL, {
+                    method: "PUT",
+                    headers: authHeaders({ "Content-Type": "application/json" }),
+                    body: JSON.stringify(payload)
+                }, "SoftDeleteCompany(UpdateCompany)");
+
+                loadCompanies();
+            } catch (err) {
+                console.error(err);
+                showError("فشل تعطيل الشركة.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadCompanies);
+    </script>
+
+</body>
+
+</html>

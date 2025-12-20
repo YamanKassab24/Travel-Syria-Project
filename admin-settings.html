@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إعدادات النظام - لوحة الأدمن</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e5e7eb;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .switch-row input[type="checkbox"] {
+            transform: scale(1.1);
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .success-box {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        @media (max-width: 1000px) {
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="admin-dashboard.html">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="admin-companies.html">الشركات</a>
+            <a href="admin-trips.html">الرحلات</a>
+            <a href="admin-reservations.html">الحجوزات</a>
+            <a href="admin-services.html">الخدمات</a>
+            <a href="admin-cities.html">المدن</a>
+            <a href="admin-countries.html">الدول</a>
+            <a href="admin-payments.html">المدفوعات</a>
+            <a href="admin-message.html">الرسائل</a>
+            <a href="admin-settings.html">إعدادات النظام</a>
+        </div>
+
+        =
+        <div class="content">
+            <h1>إعدادات النظام</h1>
+
+            <div id="errorBox" class="error-box"></div>
+            <div id="successBox" class="success-box"></div>
+
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>معلومات عامة</h2>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم النظام</label>
+                        <input type="text" value="Travel Booking System" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>إصدار الواجهة (Front)</label>
+                        <input type="text" value="v1.0.0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>عنوان الـ API</label>
+                        <input type="text" value="http://yamankassab-001-site1.mtempurl.com" readonly>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>الإعدادات العامة</h2>
+                </div>
+                <div class="small-text">
+                    هذه الإعدادات تحفظ محلياً في المتصفح (localStorage) للوحة الأدمن فقط.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="sysLanguage">لغة الواجهة الافتراضية</label>
+                        <select id="sysLanguage">
+                            <option value="ar">العربية</option>
+                            <option value="en">الإنكليزية</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sysCurrency">العملة الافتراضية</label>
+                        <select id="sysCurrency">
+                            <option value="SYP">SYP - الليرة السورية</option>
+                            <option value="AED">AED - الدرهم الإماراتي</option>
+                            <option value="USD">USD - الدولار الأمريكي</option>
+                            <option value="EUR">EUR - اليورو</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sysTimezone">المنطقة الزمنية</label>
+                        <select id="sysTimezone">
+                            <option value="Asia/Damascus">Asia/Damascus</option>
+                            <option value="Asia/Dubai">Asia/Dubai</option>
+                            <option value="Europe/Amsterdam">Europe/Amsterdam</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>وضع الصيانة</label>
+                        <div class="switch-row">
+                            <input type="checkbox" id="sysMaintenance">
+                            <span class="small-text">تفعيل صفحة "النظام قيد الصيانة" للمستخدمين (فكرة فقط
+                                حالياً)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>السماح بالتسجيل الجديد</label>
+                        <div class="switch-row">
+                            <input type="checkbox" id="sysRegistration">
+                            <span class="small-text">إذا كان مغلقاً يمكن منع تسجيل مستخدمين جدد</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تفعيل الحجوزات أونلاين</label>
+                        <div class="switch-row">
+                            <input type="checkbox" id="sysOnlineBooking">
+                            <span class="small-text">في حالة الإيقاف، يمكن إظهار تنبيه للمستخدمين فقط.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>إعدادات الرسائل والتنبيهات</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="sysSupportEmail">إيميل الدعم الفني</label>
+                        <input type="email" id="sysSupportEmail" placeholder="support@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="sysFromName">اسم المُرسل في الإيميلات</label>
+                        <input type="text" id="sysFromName" placeholder="Travel Booking Support">
+                    </div>
+                    <div class="form-group">
+                        <label for="sysNotifLevel">مستوى التفاصيل في الإشعارات</label>
+                        <select id="sysNotifLevel">
+                            <option value="basic">أساسي</option>
+                            <option value="normal">عادي</option>
+                            <option value="detailed">تفصيلي</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sysFooterNote">ملاحظة في أسفل الإيميل / التطبيق</label>
+                    <textarea id="sysFooterNote" placeholder="مثال: شكراً لاختياركم شركتنا للسفر..."></textarea>
+                </div>
+            </div>
+
+            <!-- أزرار -->
+            <div style="margin-bottom:30px;">
+                <button onclick="saveSettings()">حفظ الإعدادات</button>
+                <button class="secondary" onclick="resetSettings()">إرجاع الإعدادات الافتراضية</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SETTINGS_KEY = "travel_admin_settings_v1";
+
+        function showError(msg) {
+            const box = document.getElementById("errorBox");
+            box.textContent = msg;
+            box.style.display = "block";
+        }
+
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        function showSuccess(msg) {
+            const box = document.getElementById("successBox");
+            box.textContent = msg;
+            box.style.display = "block";
+            setTimeout(() => {
+                box.style.display = "none";
+            }, 2000);
+        }
+
+        function getDefaultSettings() {
+            return {
+                language: "ar",
+                currency: "SYP",
+                timezone: "Asia/Damascus",
+                maintenance: false,
+                registrationOpen: true,
+                onlineBooking: true,
+                supportEmail: "",
+                fromName: "",
+                notifLevel: "normal",
+                footerNote: ""
+            };
+        }
+
+        function loadSettings() {
+            clearError();
+            let settings = getDefaultSettings();
+
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    settings = Object.assign(settings, parsed);
+                }
+            } catch (e) {
+                console.error("Error reading settings:", e);
+                showError("تعذر قراءة الإعدادات المخزنة محلياً");
+            }
+
+
+            document.getElementById("sysLanguage").value = settings.language;
+            document.getElementById("sysCurrency").value = settings.currency;
+            document.getElementById("sysTimezone").value = settings.timezone;
+
+            document.getElementById("sysMaintenance").checked = settings.maintenance;
+            document.getElementById("sysRegistration").checked = settings.registrationOpen;
+            document.getElementById("sysOnlineBooking").checked = settings.onlineBooking;
+
+            document.getElementById("sysSupportEmail").value = settings.supportEmail;
+            document.getElementById("sysFromName").value = settings.fromName;
+            document.getElementById("sysNotifLevel").value = settings.notifLevel;
+            document.getElementById("sysFooterNote").value = settings.footerNote;
+        }
+
+        function saveSettings() {
+            clearError();
+
+            const settings = {
+                language: document.getElementById("sysLanguage").value,
+                currency: document.getElementById("sysCurrency").value,
+                timezone: document.getElementById("sysTimezone").value,
+                maintenance: document.getElementById("sysMaintenance").checked,
+                registrationOpen: document.getElementById("sysRegistration").checked,
+                onlineBooking: document.getElementById("sysOnlineBooking").checked,
+                supportEmail: document.getElementById("sysSupportEmail").value.trim(),
+                fromName: document.getElementById("sysFromName").value.trim(),
+                notifLevel: document.getElementById("sysNotifLevel").value,
+                footerNote: document.getElementById("sysFooterNote").value.trim()
+            };
+
+            try {
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                showSuccess("تم حفظ الإعدادات (محلياً في المتصفح)");
+            } catch (e) {
+                console.error("Error saving settings:", e);
+                showError("تعذر حفظ الإعدادات محلياً");
+            }
+        }
+
+        function resetSettings() {
+            if (!confirm("هل أنت متأكد من إرجاع الإعدادات للقيم الافتراضية؟")) return;
+
+            try {
+                localStorage.removeItem(SETTINGS_KEY);
+            } catch (e) {
+                console.error(e);
+            }
+            loadSettings();
+            showSuccess("تم إرجاع الإعدادات الافتراضية");
+        }
+
+        document.addEventListener("DOMContentLoaded", loadSettings);
+    </script>
+</body>
+
+</html>

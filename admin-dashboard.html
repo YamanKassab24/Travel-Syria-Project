@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم الأدمن - Travel Admin</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #1f2933;
+            color: #fff;
+            padding: 20px 15px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #cbd2d9;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover {
+            background: #323f4b;
+            color: #fff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .card .value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .card small {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 320px;
+        }
+
+        .panel h2 {
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-completed {
+            background: #e0f2fe;
+            color: #1d4ed8;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .loading {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .sidebar h2 {
+                width: 100%;
+            }
+
+            .sidebar a {
+                display: inline-block;
+                margin-left: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <div class="sidebar">
+            <h2>لوحة الأدمن</h2>
+            <a href="#">لوحة التحكم</a>
+            <a href="admin-users.html">المستخدمون</a>
+            <a href="#">الشركات</a>
+            <a href="#">الرحلات</a>
+            <a href="#">الحجوزات</a>
+            <a href="#">الخدمات</a>
+            <a href="#">المدن</a>
+            <a href="#">الدول</a>
+            <a href="#">المدفوعات</a>
+            <a href="#">الرسائل</a>
+            <a href="#">إعدادات النظام</a>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <h1>لوحة تحكم الأدمن</h1>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="cards">
+                <div class="card">
+                    <h3>عدد المستخدمين</h3>
+                    <div class="value" id="userCount">-</div>
+                    <small>إجمالي الحسابات المسجلة في النظام</small>
+                </div>
+                <div class="card">
+                    <h3>عدد الشركات</h3>
+                    <div class="value" id="companyCount">-</div>
+                    <small>إجمالي شركات النقل المسجلة</small>
+                </div>
+                <div class="card">
+                    <h3>إجمالي الرحلات</h3>
+                    <div class="value" id="tripCount">-</div>
+                    <small>كل الرحلات النشطة في النظام</small>
+                </div>
+                <div class="card">
+                    <h3>إجمالي الحجوزات</h3>
+                    <div class="value" id="reservationCount">-</div>
+                    <small>كل الحجوزات المسجلة</small>
+                </div>
+                <div class="card">
+                    <h3>عدد حجوزات اليوم</h3>
+                    <div class="value" id="todayReservationsCount">-</div>
+                    <small>حجوزات بتاريخ اليوم فقط</small>
+                </div>
+            </div>
+
+            <div class="flex-row">
+                <div class="panel">
+                    <h2>أحدث الرحلات</h2>
+                    <p id="tripsLoading" class="loading">جاري تحميل بيانات الرحلات...</p>
+                    <table id="tripsTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>من</th>
+                                <th>إلى</th>
+                                <th>الوقت</th>
+                                <th>السعر</th>
+                                <th>الشركة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <p class="small-text">يتم عرض آخر 5 رحلات فقط.</p>
+                </div>
+
+                <div class="panel">
+                    <h2>أحدث الحجوزات</h2>
+                    <p id="reservationsLoading" class="loading">جاري تحميل بيانات الحجوزات...</p>
+                    <table id="reservationsTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الزبون</th>
+                                <th>الرحلة</th>
+                                <th>المقاعد</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <p class="small-text">يتم عرض آخر 5 حجوزات فقط.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+
+
+        const TOKEN_KEY = "token";
+
+
+        const ENDPOINTS = {
+            users: API_BASE + "/api/User/GetAllUsers",
+            companies: API_BASE + "/api/Company/GetAllCompanies",
+            trips: API_BASE + "/api/Trip/GetAllTrips",
+            reservations: API_BASE + "/api/Reservation/GetAllReservations",
+
+        };
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY);
+        }
+
+        function requireAuthOrRedirect() {
+            const token = getToken();
+            if (!token) {
+
+                window.location.href = "login.html";
+                return false;
+            }
+            return true;
+        }
+
+        function showError(message) {
+            const box = document.getElementById("errorBox");
+            box.style.display = "block";
+            box.textContent = message;
+        }
+
+        async function fetchJson(url, label) {
+            try {
+                const token = getToken();
+
+                const res = await fetch(url, {
+                    headers: {
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (res.status === 401) {
+                    localStorage.removeItem(TOKEN_KEY);
+                    window.location.href = "login.html";
+                    return [];
+                }
+                if (!res.ok) {
+                    throw new Error(label + " API error: " + res.status);
+                }
+
+                return await res.json();
+            } catch (err) {
+                console.error(err);
+                showError("حدث خطأ أثناء جلب " + label + " من الخادم.");
+                return [];
+            }
+        }
+
+        function formatDateTime(dtString) {
+            if (!dtString) return "";
+            const d = new Date(dtString);
+            if (isNaN(d.getTime())) return dtString;
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            const hours = String(d.getHours()).padStart(2, "0");
+            const mins = String(d.getMinutes()).padStart(2, "0");
+            return `${year}-${month}-${day} ${hours}:${mins}`;
+        }
+
+        function sameDate(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getDate() === d2.getDate();
+        }
+
+        function getReservationStatusClass(status) {
+
+            switch (status) {
+                case 0: return "status-pending";
+                case 1: return "status-confirmed";
+                case 2: return "status-cancelled";
+                case 3: return "status-completed";
+                default: return "";
+            }
+        }
+
+        function getReservationStatusText(status) {
+            switch (status) {
+                case 0: return "Pending";
+                case 1: return "Confirmed";
+                case 2: return "Cancelled";
+                case 3: return "Completed";
+                default: return status;
+            }
+        }
+
+        async function loadDashboard() {
+
+            if (!requireAuthOrRedirect()) return;
+
+
+            const [
+                users,
+                companies,
+                trips,
+                reservations
+            ] = await Promise.all([
+                fetchJson(ENDPOINTS.users, "المستخدمين"),
+                fetchJson(ENDPOINTS.companies, "الشركات"),
+                fetchJson(ENDPOINTS.trips, "الرحلات"),
+                fetchJson(ENDPOINTS.reservations, "الحجوزات")
+            ]);
+
+
+            document.getElementById("userCount").textContent = users.length;
+            document.getElementById("companyCount").textContent = companies.length;
+            document.getElementById("tripCount").textContent = trips.length;
+            document.getElementById("reservationCount").textContent = reservations.length;
+
+
+            const today = new Date();
+            const todayReservations = reservations.filter(r => {
+                const rd = r.reservationDate || r.ReservationDate;
+                if (!rd) return false;
+                const d = new Date(rd);
+                return sameDate(d, today);
+            });
+            document.getElementById("todayReservationsCount").textContent = todayReservations.length;
+
+
+            const tripsLoading = document.getElementById("tripsLoading");
+            const tripsTable = document.getElementById("tripsTable");
+            const tripsTbody = tripsTable.querySelector("tbody");
+
+            tripsLoading.style.display = "none";
+            tripsTable.style.display = "table";
+
+
+            const sortedTrips = [...trips].sort((a, b) => {
+                const da = new Date(a.departureTime || a.DepartureTime || 0);
+                const db = new Date(b.departureTime || b.DepartureTime || 0);
+                return db - da;
+            }).slice(0, 5);
+
+            tripsTbody.innerHTML = "";
+            sortedTrips.forEach((t, index) => {
+                const tr = document.createElement("tr");
+
+                const depCity = t.departureCity?.cityName || t.DepartureCity?.CityName || "";
+                const arrCity = t.arrivalCity?.cityName || t.ArrivalCity?.CityName || "";
+                const companyName = t.company?.companyName || t.Company?.CompanyName || "";
+
+                tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${depCity}</td>
+                <td>${arrCity}</td>
+                <td>${formatDateTime(t.departureTime || t.DepartureTime)}</td>
+                <td>${t.price ?? t.Price ?? ""}</td>
+                <td>${companyName}</td>
+            `;
+                tripsTbody.appendChild(tr);
+            });
+
+
+            const resLoading = document.getElementById("reservationsLoading");
+            const resTable = document.getElementById("reservationsTable");
+            const resTbody = resTable.querySelector("tbody");
+
+            resLoading.style.display = "none";
+            resTable.style.display = "table";
+
+            const sortedReservations = [...reservations].sort((a, b) => {
+                const da = new Date(a.reservationDate || a.ReservationDate || 0);
+                const db = new Date(b.reservationDate || b.ReservationDate || 0);
+                return db - da;
+            }).slice(0, 5);
+
+            resTbody.innerHTML = "";
+            sortedReservations.forEach((r, index) => {
+                const userName =
+                    r.user?.person?.firstName && r.user?.person?.lastName
+                        ? r.user.person.firstName + " " + r.user.person.lastName
+                        : (r.User?.Person?.FirstName
+                            ? r.User.Person.FirstName + " " + r.User.Person.LastName
+                            : "");
+
+                const tripInfo =
+                    r.trip?.departureCity?.cityName && r.trip?.arrivalCity?.cityName
+                        ? r.trip.departureCity.cityName + " → " + r.trip.arrivalCity.cityName
+                        : (r.Trip?.DepartureCity?.CityName
+                            ? r.Trip.DepartureCity.CityName + " → " + r.Trip.ArrivalCity.CityName
+                            : "");
+
+                const seats = r.seatsCount ?? r.SeatsCount ?? "";
+                const total = r.totalPrice ?? r.TotalPrice ?? "";
+
+                const statusVal = r.status ?? r.Status;
+                const statusClass = getReservationStatusClass(statusVal);
+                const statusText = getReservationStatusText(statusVal);
+
+                const trEl = document.createElement("tr");
+                trEl.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${userName}</td>
+                <td>${tripInfo}</td>
+                <td>${seats}</td>
+                <td>${total}</td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+            `;
+                resTbody.appendChild(trEl);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadDashboard);
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <title>إدارة الحجوزات - لوحة الأدمن</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 230px;
+      background: #111827;
+      color: #fff;
+      padding: 20px 15px;
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #e5e7eb;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: #1f2937;
+      color: #fff;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .filters {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      min-width: 180px;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      background: #2563eb;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.danger {
+      background: #b91c1c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    .badge-status-0 {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .badge-status-1 {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-status-2 {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-status-3 {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .error-box {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 750px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 7px 8px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .modal-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .services-box {
+      grid-column: 1 / -1;
+    }
+
+    .services-list {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px;
+      max-height: 190px;
+      overflow-y: auto;
+      background: #f9fafb;
+      font-size: 12px;
+    }
+
+    .service-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .service-item label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 0;
+      font-size: 12px;
+    }
+
+    .service-price-label {
+      font-size: 12px;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <h2>لوحة الأدمن</h2>
+      <a href="admin-dashboard.html">لوحة التحكم</a>
+      <a href="admin-users.html">المستخدمون</a>
+      <a href="admin-companies.html">الشركات</a>
+      <a href="admin-trips.html">الرحلات</a>
+      <a href="admin-reservations.html">الحجوزات</a>
+      <a href="admin-services.html">الخدمات</a>
+      <a href="admin-cities.html">المدن</a>
+      <a href="admin-countries.html">الدول</a>
+      <a href="admin-payments.html">المدفوعات</a>
+      <a href="admin-message.html">الرسائل</a>
+      <a href="admin-settings.html">إعدادات النظام</a>
+    </div>
+
+    <div class="content">
+      <h1>إدارة الحجوزات</h1>
+
+      <div id="errorBox" class="error-box"></div>
+
+      <div class="filters">
+        <button onclick="openAddModal()">إضافة حجز جديد</button>
+        <button class="secondary" onclick="loadReservations()">تحديث القائمة</button>
+
+        <input id="tripIdFilter" type="number" placeholder="فلترة حسب رقم الرحلة TripID" />
+        <select id="statusFilter">
+          <option value="">فلترة حسب الحالة (الكل)</option>
+          <option value="0">0 - Pending</option>
+          <option value="1">1 - Confirmed</option>
+          <option value="2">2 - Cancelled</option>
+          <option value="3">3 - Completed</option>
+        </select>
+
+        <button class="secondary" onclick="clearFilters()">مسح الفلاتر</button>
+
+      </div>
+
+      <table id="resTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ReservationID</th>
+            <th>الزبون</th>
+            <th>الرحلة</th>
+            <th>المقاعد</th>
+            <th>المبلغ</th>
+            <th>الحالة</th>
+            <th>تاريخ الحجز</th>
+            <th>تحكم</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="resModal">
+    <div class="modal">
+      <h2 id="modalTitle">إضافة حجز جديد</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>رقم المستخدم (UserID)</label>
+          <input type="number" id="userID">
+        </div>
+
+        <div class="form-group">
+          <label>رقم الرحلة (TripID)</label>
+          <input type="number" id="tripID">
+        </div>
+
+        <div class="form-group" style="grid-column:1/-1;">
+          <button type="button" class="secondary" onclick="loadTripServicesFromInput()">تحميل خدمات هذه الرحلة</button>
+        </div>
+
+        <div class="form-group">
+          <label>عدد المقاعد</label>
+          <input type="number" id="seatsCount" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>المبلغ الكلي (TotalPrice)</label>
+          <input type="number" step="0.01" id="totalPrice">
+        </div>
+
+        <div class="form-group">
+          <label>تاريخ الحجز</label>
+          <input type="datetime-local" id="reservationDate">
+        </div>
+
+        <div class="form-group">
+          <label>الحالة</label>
+          <select id="status">
+            <option value="0">0 - Pending</option>
+            <option value="1">1 - Confirmed</option>
+            <option value="2">2 - Cancelled</option>
+            <option value="3">3 - Completed</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column:1/-1;">
+          <button type="button" class="secondary" onclick="calculateTripPrice()">احسب المبلغ من سعر الرحلة (Trip ×
+            Seats)</button>
+        </div>
+
+        <div class="form-group services-box">
+          <label>الخدمات الإضافية لهذه الرحلة</label>
+          <div id="servicesContainer" class="services-list">
+            <div class="small-text">أدخل رقم الرحلة ثم اضغط "تحميل خدمات هذه الرحلة".</div>
+          </div>
+          <span class="small-text">
+            يتم جلب الخدمات من TripService الخاصة بالرحلة (GetTripServicesByTripID). إذا اخترت خدمة، سيتم ربطها بالحجز
+            الجديد في جدول ReservationServices.
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="saveReservation()">حفظ</button>
+        <button class="secondary" onclick="closeModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://yamankassab-001-site1.mtempurl.com";
+
+
+    const TOKEN_KEY = "token";
+    function getToken() { return localStorage.getItem(TOKEN_KEY); }
+    function requireAuthOrRedirect() {
+      const t = getToken();
+      if (!t) { window.location.href = "login.html"; return false; }
+      return true;
+    }
+    function authHeaders(extra = {}) {
+      const t = getToken();
+      return { "Accept": "application/json", "Authorization": `Bearer ${t}`, ...extra };
+    }
+    async function fetchAny(url, options = {}, label = "") {
+      const res = await fetch(url, options);
+      if (res.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+        window.location.href = "login.html";
+        return null;
+      }
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error((label ? label + ": " : "") + txt);
+      }
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) return await res.json();
+      return await res.text();
+    }
+
+    const GET_RES_URL = API_BASE + "/api/Reservation/GetAllReservations";
+    const ADD_RES_URL = API_BASE + "/api/Reservation/AddNewReservation";
+    const UPDATE_RES_URL = API_BASE + "/api/Reservation/UpdateReservation";
+    const DELETE_RES_URL = API_BASE + "/api/Reservation/DeleteReservationByReservationID";
+
+    const GET_TRIP_BY_ID = API_BASE + "/api/Trip/GetTripByID";
+    const GET_TRIP_SERVICES_BY_TRIPID = API_BASE + "/api/TripService/GetTripServicesByTripID";
+    const ADD_RES_SERVICE_URL = API_BASE + "/api/ReservationService/AddNewReservationService";
+
+    let currentMode = "add";
+    let editResId = null;
+    let loadedReservations = [];
+    let loadedTripServices = [];
+
+    const statusLabels = ["Pending", "Confirmed", "Cancelled", "Completed"];
+
+    const els = {
+      errorBox: document.getElementById("errorBox"),
+      tbody: document.querySelector("#resTable tbody"),
+      tripIdFilter: document.getElementById("tripIdFilter"),
+      statusFilter: document.getElementById("statusFilter"),
+
+      modal: document.getElementById("resModal"),
+      modalTitle: document.getElementById("modalTitle"),
+
+      userID: document.getElementById("userID"),
+      tripID: document.getElementById("tripID"),
+      seatsCount: document.getElementById("seatsCount"),
+      totalPrice: document.getElementById("totalPrice"),
+      reservationDate: document.getElementById("reservationDate"),
+      status: document.getElementById("status"),
+
+      servicesContainer: document.getElementById("servicesContainer")
+    };
+
+    function showError(msg) { els.errorBox.textContent = msg; els.errorBox.style.display = "block"; }
+    function clearError() { els.errorBox.textContent = ""; els.errorBox.style.display = "none"; }
+
+    function formatDateTime(dtString) {
+      if (!dtString) return "";
+      const d = new Date(dtString);
+      if (isNaN(d.getTime())) return dtString;
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      const h = String(d.getHours()).padStart(2, "0");
+      const m = String(d.getMinutes()).padStart(2, "0");
+      return `${h}:${m} ${year}-${month}-${day}`;
+    }
+
+    function formatDateTimeForInput(dtString) {
+      if (!dtString) return "";
+      const d = new Date(dtString);
+      if (isNaN(d.getTime())) return "";
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mi = String(d.getMinutes()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    }
+
+    function createStatusBadge(statusValue) {
+      const idx = Number(statusValue) || 0;
+      const label = statusLabels[idx] || ("Status " + idx);
+      return `<span class="badge badge-status-${idx}">${label}</span>`;
+    }
+
+    function getTripIdFromReservation(r) {
+      const trip = r.trip || r.Trip || {};
+      return (trip.tripID || trip.TripID || r.tripID || r.TripID || null);
+    }
+    function getStatusFromReservation(r) {
+      return (r.status ?? r.Status ?? 0);
+    }
+
+    function applyFilters(list) {
+      const tripId = els.tripIdFilter.value ? Number(els.tripIdFilter.value) : null;
+      const st = els.statusFilter.value === "" ? null : Number(els.statusFilter.value);
+
+      return list.filter(r => {
+        const tId = getTripIdFromReservation(r);
+        const status = Number(getStatusFromReservation(r)) || 0;
+
+        if (tripId != null && Number(tId) !== tripId) return false;
+        if (st != null && status !== st) return false;
+
+        return true;
+      });
+    }
+
+    function renderReservations() {
+      const list = applyFilters(loadedReservations);
+      els.tbody.innerHTML = "";
+
+      if (!list || list.length === 0) {
+        els.tbody.innerHTML = `<tr><td colspan="9">لا توجد نتائج مطابقة.</td></tr>`;
+        return;
+      }
+
+      list.forEach((r, idx) => {
+        const resID = r.reservationID || r.ReservationID;
+        const seats = r.seatsCount || r.SeatsCount;
+        const total = r.totalPrice || r.TotalPrice || 0;
+        const resDate = r.reservationDate || r.ReservationDate;
+        const status = getStatusFromReservation(r);
+
+        const user = r.user || r.User || {};
+        const person = user.person || user.Person || {};
+        const firstName = person.firstName || person.FirstName || "";
+        const lastName = person.lastName || person.LastName || "";
+
+        const trip = r.trip || r.Trip || {};
+        const tripID = trip.tripID || trip.TripID || "";
+        const depCity = trip.departureCity || trip.DepartureCity || {};
+        const arrCity = trip.arrivalCity || trip.ArrivalCity || {};
+        const fromCity = depCity.cityName || depCity.CityName || "";
+        const toCity = arrCity.cityName || arrCity.CityName || "";
+        const route = (fromCity && toCity) ? `${fromCity} → ${toCity}` : (tripID ? `TripID: ${tripID}` : "");
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td>${resID ?? ""}</td>
+        <td>${(firstName + " " + lastName).trim()}</td>
+        <td>${route}</td>
+        <td>${seats}</td>
+        <td>${total}</td>
+        <td>${createStatusBadge(status)}</td>
+        <td>${formatDateTime(resDate)}</td>
+        <td>
+          <button style="padding:4px 8px;font-size:12px;" onclick="openEditModalById(${resID})">تعديل</button>
+          <button class="danger" style="padding:4px 8px;font-size:12px;margin-right:4px;" onclick="deleteReservation(${resID})">حذف</button>
+        </td>
+      `;
+        els.tbody.appendChild(tr);
+      });
+    }
+
+    async function loadReservations() {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+      els.tbody.innerHTML = `<tr><td colspan="9">جاري تحميل البيانات...</td></tr>`;
+
+      try {
+        const data = await fetchAny(GET_RES_URL, { headers: authHeaders() }, "GetAllReservations");
+        if (data == null) return;
+        loadedReservations = Array.isArray(data) ? data : [data];
+        renderReservations();
+      } catch (err) {
+        console.error(err);
+        showError("فشل جلب بيانات الحجوزات من الخادم.");
+      }
+    }
+
+    function renderTripServices(services) {
+      els.servicesContainer.innerHTML = "";
+      if (!services || services.length === 0) {
+        els.servicesContainer.innerHTML = "<div>لا توجد خدمات مضافة لهذه الرحلة.</div>";
+        return;
+      }
+
+      services.forEach(ts => {
+        const price = ts.price || ts.Price || 0;
+        const svc = ts.service || ts.Service || {};
+        const serviceID = svc.serviceID || svc.ServiceID;
+        const serviceName = svc.serviceName || svc.ServiceName || "";
+
+        const row = document.createElement("div");
+        row.className = "service-item";
+        row.innerHTML = `
+        <label>
+          <input type="checkbox" class="service-check" data-service-id="${serviceID}" data-price="${price}">
+          <span>${serviceName}</span>
+        </label>
+        <span class="service-price-label">${price} (سعر الخدمة)</span>
+      `;
+        els.servicesContainer.appendChild(row);
+      });
+    }
+
+    async function loadTripServices(tripId) {
+      els.servicesContainer.innerHTML = "<div>جاري تحميل خدمات الرحلة...</div>";
+      loadedTripServices = [];
+
+      try {
+        const url = GET_TRIP_SERVICES_BY_TRIPID + "?TripID=" + encodeURIComponent(tripId);
+        const data = await fetchAny(url, { headers: authHeaders() }, "GetTripServicesByTripID");
+        if (data == null) return;
+
+        const services = Array.isArray(data) ? data : [data];
+        loadedTripServices = services;
+        renderTripServices(services);
+      } catch (err) {
+        console.error(err);
+        els.servicesContainer.innerHTML = "<div>فشل جلب خدمات هذه الرحلة.</div>";
+      }
+    }
+
+    function loadTripServicesFromInput() {
+      clearError();
+      const tripIdVal = els.tripID.value;
+      if (!tripIdVal) { showError("أدخل رقم الرحلة أولاً."); return; }
+      loadTripServices(tripIdVal);
+    }
+
+    function openAddModal() {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+      currentMode = "add";
+      editResId = null;
+
+      els.modalTitle.textContent = "إضافة حجز جديد";
+      els.userID.value = "";
+      els.tripID.value = "";
+      els.seatsCount.value = "";
+      els.totalPrice.value = "";
+      els.reservationDate.value = "";
+      els.status.value = "0";
+
+      loadedTripServices = [];
+      els.servicesContainer.innerHTML = '<div class="small-text">أدخل رقم الرحلة ثم اضغط "تحميل خدمات هذه الرحلة".</div>';
+
+      els.modal.style.display = "flex";
+    }
+
+    function openEditModalById(resId) {
+      const idx = loadedReservations.findIndex(x => (x.reservationID || x.ReservationID) === resId);
+      openEditModal(idx);
+    }
+
+    function openEditModal(index) {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+      currentMode = "edit";
+
+      const r = loadedReservations[index];
+      if (!r) { showError("تعذر العثور على بيانات هذا الحجز."); return; }
+
+      editResId = r.reservationID || r.ReservationID;
+
+      const seats = r.seatsCount || r.SeatsCount;
+      const total = r.totalPrice || r.TotalPrice || "";
+      const resDate = r.reservationDate || r.ReservationDate;
+      const status = getStatusFromReservation(r);
+
+      const user = r.user || r.User || {};
+      const userID = user.userID || user.UserID || "";
+
+      const trip = r.trip || r.Trip || {};
+      const tripID = trip.tripID || trip.TripID || "";
+
+      els.modalTitle.textContent = "تعديل حجز";
+      els.userID.value = userID;
+      els.tripID.value = tripID;
+      els.seatsCount.value = seats;
+      els.totalPrice.value = total;
+      els.reservationDate.value = formatDateTimeForInput(resDate);
+      els.status.value = String(status);
+
+      loadedTripServices = [];
+      els.servicesContainer.innerHTML = '<div class="small-text">تعديل الخدمات غير مفعّل حالياً من هذه الواجهة.</div>';
+
+      els.modal.style.display = "flex";
+    }
+
+    function closeModal() { els.modal.style.display = "none"; }
+
+    function getIsoFromInput(el, fallbackNow = true) {
+      const val = el.value;
+      if (!val) return fallbackNow ? new Date().toISOString() : null;
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return fallbackNow ? new Date().toISOString() : null;
+      return d.toISOString();
+    }
+
+    async function calculateTripPrice() {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+
+      const tripIdVal = els.tripID.value;
+      const seatsVal = els.seatsCount.value;
+
+      if (!tripIdVal || !seatsVal) {
+        showError("يجب إدخال TripID وعدد المقاعد أولاً.");
+        return;
+      }
+
+      try {
+        const url = GET_TRIP_BY_ID + "?TripID=" + encodeURIComponent(tripIdVal);
+        const trip = await fetchAny(url, { headers: authHeaders() }, "GetTripByID");
+        if (trip == null) return;
+
+        const price = trip.price || trip.Price || 0;
+        const seats = parseInt(seatsVal, 10) || 0;
+        els.totalPrice.value = (price * seats);
+      } catch (err) {
+        console.error(err);
+        showError("تعذر جلب سعر الرحلة لحساب المبلغ");
+      }
+    }
+
+    function getSelectedTripServices() {
+      const checks = els.servicesContainer.querySelectorAll(".service-check");
+      const result = [];
+      checks.forEach(chk => {
+        if (chk.checked) {
+          result.push({
+            serviceID: parseInt(chk.dataset.serviceId, 10),
+            price: parseFloat(chk.dataset.price || "0")
+          });
+        }
+      });
+      return result;
+    }
+
+    async function saveReservation() {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+
+      const userID = parseInt(els.userID.value || "0", 10);
+      const tripID = parseInt(els.tripID.value || "0", 10);
+      const seats = parseInt(els.seatsCount.value || "0", 10);
+      const total = parseFloat(els.totalPrice.value || "0");
+      const status = parseInt(els.status.value || "0", 10);
+      const resDate = getIsoFromInput(els.reservationDate);
+
+      if (!userID || !tripID || !seats) {
+        showError("UserID و TripID وعدد المقاعد حقول مطلوبة.");
+        return;
+      }
+
+      try {
+        if (currentMode === "add") {
+          const payload = {
+            reservationID: 0,
+            userID, tripID,
+            seatsCount: seats,
+            totalPrice: total,
+            reservationDate: resDate,
+            status
+          };
+
+          const created = await fetchAny(ADD_RES_URL, {
+            method: "POST",
+            headers: authHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+          }, "AddNewReservation");
+
+          const newResId = created?.reservationID || created?.ReservationID || null;
+          if (newResId) {
+            const selectedServices = getSelectedTripServices();
+            for (const s of selectedServices) {
+              try {
+                await fetchAny(ADD_RES_SERVICE_URL, {
+                  method: "POST",
+                  headers: authHeaders({ "Content-Type": "application/json" }),
+                  body: JSON.stringify({ reservationID: newResId, serviceID: s.serviceID, price: s.price })
+                }, "AddNewReservationService");
+              } catch (e2) {
+                console.warn("فشل إضافة خدمة للحجز، لكن الحجز نفسه تمت إضافته.", e2);
+              }
+            }
+          }
+        } else {
+          if (!editResId) { showError("تعذر تحديد الحجز للتعديل."); return; }
+
+          const payload = { reservationID: editResId, seatsCount: seats, totalPrice: total };
+
+          await fetchAny(UPDATE_RES_URL, {
+            method: "PUT",
+            headers: authHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify(payload)
+          }, "UpdateReservation");
+        }
+
+        closeModal();
+        await loadReservations();
+      } catch (err) {
+        console.error(err);
+        showError("حدث خطأ أثناء الحفظ. راجع Console.");
+      }
+    }
+
+    async function deleteReservation(resId) {
+      if (!requireAuthOrRedirect()) return;
+      clearError();
+      if (!confirm("هل أنت متأكد من حذف هذا الحجز؟")) return;
+
+      try {
+        const url = DELETE_RES_URL + "?reservationID=" + encodeURIComponent(resId);
+        await fetchAny(url, { method: "DELETE", headers: authHeaders() }, "DeleteReservation");
+        await loadReservations();
+      } catch (err) {
+        console.error(err);
+        showError("فشل حذف الحجز. راجع Console.");
+      }
+    }
+
+    function clearFilters() {
+      els.tripIdFilter.value = "";
+      els.statusFilter.value = "";
+      renderReservations();
+    }
+
+    function wireFilters() {
+      els.tripIdFilter.addEventListener("input", renderReservations);
+      els.statusFilter.addEventListener("change", renderReservations);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuthOrRedirect()) return;
+      wireFilters();
+      loadReservations();
+    });
+  </script>
+</body>
+
+</html>
